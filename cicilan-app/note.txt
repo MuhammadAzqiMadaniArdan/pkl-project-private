@@ -1,0 +1,69 @@
+   SMPT SYSTEM
+   rvrn yptw xvzv pywn
+   
+   
+    CICILAN SYSTEM 
+    <data>
+        user{
+        username|no|noinfo
+        }
+        produk{
+            ->Cloud Server,Dedicate Server,Colocation,VPS   
+        }
+        Store{
+            produk,cicilan,
+        }
+        Order{
+            user -> produk
+            user_id,produk,name_customer,no.Telp,total_price
+        }
+        Order_product{
+            one by one
+            user -> user(admin)
+        }
+        --Relasi
+        Order OTM user_id
+        Order OTM produk
+        --
+        Question area
+        SPK,E-materai,Suspend
+        SPK (Surat Perjanjian Kerjasama)
+        E-materai (Materai digital menggunakan web E-materai)
+        Suspend (Menghentikan web sementara);
+        kita akan mengontak user
+
+    1/4 selesai >
+    !.Sistem CIcilan sudah berapa kali (history)
+    JIka cicilan sampai batas waktu admin memiliki notif menegenai user yang belum bayar di dalam menu order ->
+    admin mengirimkan form atau notif ke user yg blom bayar -> chat via wa juga -> kirim ke user juga -> dengan menu notif -> atau saat membuka web hosting user tidak bisa -> user melihat menu order -> user sudah tenggat waktu -> membuat pilihan jika cicilan ditengah atau belum bayar pilih di suspend atau mebayar -> jjika memilih suspend -> page web hosting di matikan -> jika pilih membayar masuk ke menu pembayaran
+
+    sudah >
+    
+    <Catatan tambahan jika user tdk sengaja mensuspend >
+    <Admin memiliki Hak untuk meng unSuspend User dan membri Kesempatan > - > admin entry data ke user -> utk fitur unsuspend -> user memiliki kesemptatan untuk melakukan fitur bayar;
+
+    2.cicilan udah berapa kali ? sudah bayar atau tunggakan
+    jika sudah bayar lanjut dengan spk -> jika belum maka admin menolak -> admin membuat notif pilih di suspend atau mebayar ->
+
+
+    3.SPK nya udah dibuat atau belum sudah ditandatangan atau belum
+    program SPK menggunakan E-materai 
+    admin memberikan data ke admin lainnya -> berupa email,username,no,noinfo
+    adminmembuat spk -> user memvalidasi spk <via WhatsApp> -> 
+    spk benar atau tidak -> jika tidak admin menolak -> jika benar lanjut admin mengirimkan pdf berupa spk yang sudah ditandatangani oleh admin <via wa> -> user menerima surat ->  user mengirimkan spk -> apakah ttd spk sudah benar atau tidak _> validasi benar auat tidak nya tanda  tangan terlihat dari tandatangan tersebut jika user tidak memiliki tandatangan dengan qr code atau tanda tangan bersifat free (tertulis ) -> palsu -> asli _> user memiliki tanda tangan dengan tinta basah dan berada apda form pdf tersebut -> jika benar _> admin menerima spk dan melanjutkan ke method pembayaran _> 
+        harus  punya data  
+    jika user suda
+    4.Metode pembayaran<nothing>
+    5.SPK clear
+    Admin
+    Menu Order (user->spk download(
+        didalam menu spk terdapat data user yang sudah melakukan pemesanan dan admin mendapatkan data user dengan format dokumen SPK dalam bentuk PDF
+    )->Admin mendownload PDF -> Admin melakukan ttd -> konfirmasi ke user
+    )
+    user
+    Menu Order (user->cart->SPK authenticating(
+        jika admin belum mengconfirm spk dari user maka terdapat notif "SPK belum diconfirm admin";
+        Jika sudah maka user dapat melanjutkan ke page jasa web hosting;
+    ))
+    Jika konfirmasi SPK sudah selesai maka -> admin sudah mengkonfirmasi dan menerima -> admin masuk ke menu spk -> spk confirm -> admin menekan tombol confirm -> user mendapatkan notif -> spk beres -> user dapat menmbuat web hostingnya sendiri
+    
