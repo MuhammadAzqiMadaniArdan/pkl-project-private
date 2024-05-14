@@ -33,12 +33,12 @@
         .navbar {
             /* background: linear-gradient(to bottom right, black, purple); */
             color: white;
-            opacity: 0, 1;
+            /* background: black; */
             padding: 20px;
             padding-top: 20px;
             /* background-color: var(--blue); */
             overflow: hidden;
-  position: fixed; /* Set the navbar to fixed position */
+  position: absolute; /* Set the navbar to fixed position */
   top: 0; /* Position the navbar at the top of the page */
   width: 100%; /* Full width */
   /* box-shadow: 0 0 10px rgba(0, 0, 2, 3); */
@@ -49,7 +49,7 @@
             color: white;
             font-weight: 600;
         }
-
+        
         .nav-item a:hover,
         .navbar-brand:hover {
             color: aqua;
@@ -60,6 +60,10 @@
             width: 300px
         }
 
+        #navbarText{
+            display: flex;
+            justify-content: space-between;
+        }
         .card {
             box-shadow: 0 0 10px rgba(0, 0, 2, 3);
 
@@ -139,6 +143,7 @@
 
         .card1 a {
             font-weight: bold;
+            max-width: 100%;
         }
 
         .container-sm {
@@ -155,13 +160,16 @@
             text-align: center;
 
         }
-
+        .C3{
+            max-width: 100%;
+        }
         .C3 .card{
             box-shadow: none;
             border: none;
             background-color: rgba(0, 0, 0, 0);
         }
         .card2{
+            max-width: 100%;
             display: flex;
             justify-content: space-between;
             text-align: center;
@@ -182,8 +190,36 @@
             justify-content: space-around;
         }
 
-        .C3 .img-card img {
+        .C3 .img-card {
             width: 280px;
+            position: relative;
+        }
+
+        @media (max-width:767.98px) {
+
+            .text1{
+                /* width: 100px; */
+                height: 100px;
+                margin-bottom: 100px;
+            }
+            .L1{
+                height: 150%;
+            }
+            
+            .C2{
+                max-width: 100%;
+                display: none;
+            }
+
+            .card1{
+                max-width: 100%;
+                display: none;
+            }
+            
+            .card1 a{
+                font-size:10px; 
+            }
+            
         }
     </style>
 
@@ -207,19 +243,10 @@
                                 src="https://dihostingin.com/wp-content/uploads/2021/11/White-Dihostingin-with-IKADA.png"
                                 alt=""> --}}
                                 LEGALISASI APP</a>
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false"
-                            aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
                         </button>
-                        <div class="d-flex space-around" id="navbarText">
+                        <div class="row" id="navbarText">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="">Home</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#layanan">Features</a>
-                                </li>
+                              
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register.index') }}">Register</a>
                                 </li>
@@ -255,7 +282,7 @@
                 <div class="col-sm-6 mb-3 mb-sm-0 w-25">
                     <div class="card p-2">
                         <div class="card-body">
-                            <div class="img-card"><img
+                            <div class="img-card "><img
                                     src="https://dihostingin.com/wp-content/uploads/2021/11/Server-Ujian-Online.png"
                                     alt=""></div>
                             <h5 class="card-title">Paket VPS 10 Gb</h5>
@@ -273,7 +300,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 mb-3 mb-sm-0 w-25">
+                <div class="col-sm-6 mb-3 mb-sm-0 w-25 row-2">
                     <div class="card p-2">
                         <div class="card-body">
                             <div class="img-card"><img src="https://dihostingin.com/wp-content/uploads/2021/11/SSD.png"
@@ -296,58 +323,8 @@
                 </div>
             </div>
         </div>
-        <div class="C3">
-            <div class="text3 mb-5 mt-5" style="text-align: center">
-                <h1>Kenapa Pilih Dihostingin ? </h1>
-            </div>
-            <div class="card2">
-                <div class="row" style="margin-right: 1px;">
-                    <div class="col-sm-7 mb-3 mb-sm-0 w-25">
-                        <div class="card p-2">
-                            <div class="card-body">
-                                <div class="img-card"><img
-                                        src="https://dihostingin.com/wp-content/uploads/2021/11/choose-us-1.png"
-                                        alt=""></div>
-                                <h5 class="card-title">Safe and Secured</h5>
-                                <p>Tim kami menjamin website anda selalu aman dan terjamin
-
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-sm-6 mb-3 mb-sm-0 w-25">
-                        <div class="card p-2">
-                            <div class="card-body">
-                                <div class="img-card"><img
-                                        src="https://dihostingin.com/wp-content/uploads/2021/11/choose-us-1.png"
-                                        alt=""></div>
-                                <h5 class="card-title">99.5% Uptime Guarantee
-                                </h5>
-                                <p>Uptime sampai dengan 99,5% tanpa gangguan. Test kecepatan
-
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 w-25">
-                        <div class="card p-2">
-                            <div class="card-body">
-                                <div class="img-card"><img
-                                        src="https://dihostingin.com/wp-content/uploads/2021/11/choose-us-1.png"
-                                        alt=""></div>
-                                <h5 class="card-title">Our Dedicated Support
-                                </h5>
-                                <p>Uptime sampai dengan 99,98% tanpa gangguan
-
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
+    
 
 </body>
 {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

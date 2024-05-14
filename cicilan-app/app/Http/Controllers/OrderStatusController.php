@@ -11,13 +11,17 @@ use App\Models\User;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+  
 // use App\Http\Controllers\delete;
 use Carbon\Carbon;
 use PDF;
 use App\Exports\OrderExport;
 use Excel;
 use Illuminate\Support\Arr;
-use Maatwebsite\Excel\Excel as ExcelExcel;
 use RealRashid\SweetAlert\Facades\Alert;
 use Termwind\Components\Dd;
 
@@ -32,10 +36,6 @@ class OrderStatusController extends Controller
         // Isi dipetik disamakan dengan nama functionnya  di modelnya
         $order_statuses = Order_status::OrderBy('id', 'ASC')->simplePaginate(5);
         $orders = Order::with('user')->simplePaginate(100);
-        // $orders1 = Order::with('user_id')->get();
-        // $orderer = Order_status::where('id', $orders1['user_id']);
-
-        // dd ($orders)
         return view('order.admin.index', compact('order_statuses', 'orders'));
     }
 
@@ -135,81 +135,71 @@ class OrderStatusController extends Controller
         // dd ($orders)
         return view('order.admin.index', compact('order_statuses', 'orders', 'orders2'));
     }
-    public function status()
+
+    public function status(Request $request,$id)
     {
+        
 
-        $status2 = Order_status::all();
-        $status1 = Order::with('user')->simplePaginate(100);
-        $statusDone = Order_status::where('data', '4')->count();
-        $statusSPK = Order_status::where('data', '1')->count();
-        $statusTTD = Order_status::where('data', '2')->count();
-        $statusWait = Order_status::where('data', '3')->count();
+            // dd($suspend);
+            $status2 = Order_status::find($id);
+            $order_id = $status2['order_id'];
+            $order = Order::where('id', $order_id)->first();
+            $user = User::where('role', 'user')->simplePaginate(100);
+            // $userGet = user::where('id',$user_id)->first();
+    
+            // $existingUser = $userGet['entryData'][0][2]['serverLabel'];
+            $serverLabel = last($order['products']);
+            $serverLabelGet = $serverLabel['serverLabel'];
+            // if($serverLabelGet == $existingUser){
+            //     $serverAll = 1;
+            // }
+    
+            $dedicMurah = [];
+            $server1 = [];
+            $sewaGet = [];
+    
+            $dedicatedDer = Order::simplePaginate(100);
+            foreach ($user as $key) {
+                $sewaStatus = $key['id'];
+                array_push($sewaGet, $sewaStatus);
+                // dd($dedicatedDer[0]['products'],$product);
+                $get1 = Order_status::where('order_id', $key['id'])->first();
+                $keyData = data_get($key, 'entryData', false);
+                // dd($keyData);
+                if ($keyData !== false) {
+                    foreach ($key['entryData'] as $product) {
+                        // dd($key);
+                        # code...
+                        $serverChecked = data_get($product, '2.serverLabel', false);
+    
+                        if ($serverChecked !== false) {
+    
+                            if ($serverChecked == $serverLabelGet) {
+                                $server2 = $key;
+                                array_push($server1, $server2);
+                            }
+                        }
+                    }
+                }
+            }
 
 
-        return view('order.admin.status', compact('status1', 'status2', 'statusDone', 'statusSPK', 'statusTTD', 'statusWait'));
+        return view('order.admin.status', compact('status2', 'user', 'server1', 'order'));
     }
 
-
-    // public function downloadExcel() {
-    //     // nama file excel ketika di download
-    //     $file_name = 'Data Seluruh Pembelian.xlsx';
-    //     // paggil logic exports nya
-    //     return Excel::download(new OrderExport, $file_name);
-    // }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
-        $products = Product::all();
-        return view('order.user.create', compact('products'));
-    }
 
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(Request $request)
-    // {
-    //     //
-    //     $request->validate([
-    //         'name_customer' => 'required',
-    //         'products' => 'required',
-    //         'no_telp' => 'required',
 
-    //     ]);
-
-    //     // hasilnya berbentuk : "itemnya" => "jumlah yang sama"
-    // // menentutak quantity (qty)
-
-    // $status = Order_status::orderBy('id','ASC')->simplePaginate(5);
-
-    // $prosesTambahData = Order_status::create([
-    //     'order_id' => $status->order_id, // Mengganti $status->order->id menjadi $status->order_id
-    //     'data' => $request->data,
-    //     'status' => $request->status,
-    // ]);
-
-
-    //     // redirect ke halaman login
-    //     return redirect()->route('order.struk',$prosesTambahData['id']);
-
-    // }
 
     /**
      * Display the specified resource.
      */
-    public function strukPembelian($id)
-    {
-        //
-        $order = Order::where('id', $id)->first();
-        return view('order.user.struk', compact('order'));
-    }
-    // public function show(Order $order)
-    // {
-    //     //
-    // }
 
     /**
      * Show the form for editing the specified resource.
@@ -217,20 +207,6 @@ class OrderStatusController extends Controller
 
     public function new_status(Request $request, $id)
     {
-
-        // $mytime = Carbon::now();
-        // dd($mytime);
-        // 30-6-2022
-        // $liveDate = $mytime->form atLocalized('%d %B %Y %H:%M:00');
-
-        // $liveInvoice = $mytime->formatLocalized('%y%m%d');
-        // $liveInvoices = $mytime->formatLocalized('240403');
-        // $liveInvoice = $mytime->formatLocalized('240722');
-        // if($request->has('suspend')){
-        //     $suspend = true;
-        // }else{
-        //     $suspend = false;
-        // }
 
         // dd($suspend);
         $status2 = Order_status::find($id);
@@ -297,6 +273,10 @@ class OrderStatusController extends Controller
         $statusWait = Order_status::where('data', '3')->count();
         $userData = User::where('id', $id)->first();
 
+        $title = 'Delete Order!';
+        $text = "Are you sure you want to delete?";
+        confirmDelete($title, $text);
+
 
         // $orders = Order::with('user')->simplePaginate(100);
 
@@ -305,9 +285,6 @@ class OrderStatusController extends Controller
 
     public function lunasUpdate(Request $request, $id)
     {
-        // $request->validate([
-        //     "entryDate" => "required",
-        // ]);
         // 1.Similar product object untuk isset ke produk lunas yan baru
         // perakan
 
@@ -321,6 +298,11 @@ class OrderStatusController extends Controller
         $existingTotal = $orderId['total_price'];
         $typeProduct = $productGet[1]['type'];
         $productCount = count($productGet) - 1;
+        
+        $productGet[$productCount]['startDate'] = $orderId['updated_at']->addDays(30 * (int)$request->bulan);
+        
+        // dd($productGet[$productCount]);
+
         for ($i = 0; $i < $productCount; $i++) {
             $productHave = $productGet[0]['type'];
             if ($productHave == 'colocation') {
@@ -430,8 +412,6 @@ class OrderStatusController extends Controller
             $totalPrice = $datacenterGet['price_after_qty'];
 
             $totalEnd = $existingTotal + $totalPrice;
-            // dd((int)$bulanOrder,$totalPrice,$totalEnd);
-            // dd($totalEnd,$existingTotal,$totalPrice);
             $orderId['total_price'] = $totalEnd;
         }
 
@@ -440,11 +420,6 @@ class OrderStatusController extends Controller
 
         $orderId['products'] = $productGet;
 
-        // dd($orderId['products'][0]['type']);
-        // if($orderId['products'][0]['type'] == 'colocation'){
-        //     $orderId['votes'] = $orderId['bulan'];
-        // }
-        // dd($productGet,$datacenter,$orderId->products);
         $orderId->save();
         if ($type == 'colocation') {
 
@@ -453,288 +428,6 @@ class OrderStatusController extends Controller
 
             return redirect()->route('status.colocation')->with('success', 'data lunas sudah terupdate');
         }
-
-        // $productGet->save();
-
-        // dd(data_fill($productGet, '0', $datacenterGet),$productGet[0],$datacenterGet);
-
-        //     $products = array_count_values($request->products);
-
-        // // penampung detail array berbentuk array 2 assoc dari data data yang dipilih
-        // $dataProducts = [];
-        // foreach ($products as $key => $value) {
-        //     $product = Product::where('id', $key)->first();
-
-        //     if ($product['type'] == 'colocation') {
-        //         $arrayAssoc = [
-        //             "id" => $key,
-        //             "label" => $request->filled('serverLabel') ? $request->serverLabel : null, // Menyimpan data perusahaan jika diisi, jika tidak, maka null
-        //             "name_product" => $product['name'],
-        //             "type" => $product['type'],
-        //             "price" => $product['price'],
-        //             "qty" => $value,
-        //             //(int) memastikan dan mengubah tipe data menjadi integer
-        //             "price_after_qty" => (int)$request->bulan * (int)$product['price'],
-
-
-        //             // "price_after_qty" => (int)$value * (int)$product['price'],
-        //         ];
-        //     } else {
-        //         $arrayAssoc = [
-        //             "id" => $key,
-        //             "name_product" => $product['name'],
-        //             "type" => $product['type'],
-        //             "price" => $product['price'],
-        //             "qty" => $value,
-        //             //(int) memastikan dan mengubah tipe data menjadi integer
-        //             "price_after_qty" => (int)$value * (int)$product['price'],
-        //             // "price_after_qty" => (int)$value * (int)$product['price'],
-        //         ];
-        //     }
-
-        //     // format assoc dimasukkan ke array penampung sebelumnya
-
-        //     array_push($dataProducts, $arrayAssoc);
-        // }
-
-        // $datacenter = [];
-        // $datanew = 0;
-        // // dd($arrayAssoc['id']);
-        // if ($arrayAssoc['type'] == "dedicated") {
-        //     $datanew = $request->datacenter;
-        // } elseif ($arrayAssoc['type'] == "colocation") {
-
-        //     if ($arrayAssoc['id'] == "10" || $arrayAssoc['id'] == "11") {
-        //         $datanew = "Jakarta";
-        //     } else {
-        //         $datanew = "Bogor";
-        //     }
-        // }
-
-        // $datasum = [
-        //     "datacenter" => $datanew,
-        //     "rack" => $request->rack,
-        // ];
-        // array_push($datacenter, $datasum);
-
-        // // var total price awalnya 0
-        // $totalPrice = 0;
-        // $votes = 1;
-        // loop data dari array penamoung yg sudah di format
-        // foreach ($dataProducts as $formatArray) {
-        //     // dia bakal menambahkan  totalPrice sebelumnya ditambah data harga dari price_after_qty
-        //     $totalPrice += (int)$formatArray['price_after_qty'];
-        // }
-        // 2.TEmpat pengubahan ip port dll
-
-        // 3.Tes menggunakan existing produk
-        // - //  $order = Order::where('id', $id)->first();
-
-        // $entryOrder = User::where('id', $order['user_id'])->first();
-        // $data = $entryOrder['entryData'];
-        // $get = data_get($data, '1.0', false);
-        // $bulanGet = data_get($data, '1.1', false);
-        // $existingServer = data_get($order, 'products.4', false);
-
-        // if ($existingServer !== false) {
-        //     $existingServer['entryDate'] = $request->entryDate;
-        //     // $date = Carbon::createFromFormat('Y.m.d', $existingServer['entryDate']);
-        //     // $daysToAdd = 5;
-        //     // $date = $date->addDays($daysToAdd);
-        //     $existingServer['dimension'] = $request->dimension;
-        //     $existingServer['serialNumber'] = $request->serialNumber;
-        //     $existingServer['type'] = $request->type;
-        //     $existingServer['series'] = $request->series;
-        //     $existingServer['serverLabel'] = $request->serverLabel;
-        //     // dd($existingServer);
-
-        //     // data_forget($existingServer, 'startDate');
-
-
-
-        //     // dd(
-        //     //     data_forget($existingServer, 'startDate'),
-        //     //     $existingServer['entryDate'] = $request->EntryDate
-        //     //     // $existingServer['startDate']
-        //     // );
-        // }
-
-        // if ($get !== false) {
-        //     $dataLunas = [$get[0], $get[1], $get[2], $get[3], $existingServer];
-
-        //     foreach ($dataLunas as $formatArray) {
-        //         // dia bakal menambahkan  totalPrice sebelumnya ditambah data harga dari price_after_qty
-        //         $totalPrice += (int)$formatArray['price_after_qty'];
-        //     }
-        //     $totalAll = $order['total_price'] + $totalPrice;
-        //     $order['total_price'] = $totalAll;
-
-        //     $order['bulan'] = $bulanGet['bulan'];
-        //     $order['votes'] = $bulanGet['bulan'];
-        //     // dd($bulanGet['bulan'],[$get[0],$get[1],$get[2],$get[3]],$order['products'],$existingServer);
-
-
-        //     $order->save();
-
-        //     $end = $order['updated_at'];
-        //     $endFill = $end->addDays(30 * $request->bulan);
-        //     data_fill($existingServer, 'endDate', $endFill);
-
-        //     $existingServer['endDate'] = $endFill;
-        //     // $cuy = date_add($end,date_interval_create_from_date_string("40 days"));
-
-
-        //     // dd($endFill,$existingServer,$request->bulan,$order['updated_at']->formatlocalized('%Y %D'));
-
-        //     // $existingServer['endDate'] = $order['updated_at']->addDays(30 * $request->bulan);
-        //     $order['products'] = [$get[0], $get[1], $get[2], $get[3], $existingServer];
-
-
-        // }
-
-        // $order->save();
-
-
-
-
-        // if ($order) {
-
-
-        //     $existingProduct1 = isset($order->products[0]) ? $order->products[0] : null;
-        //     $existingProduct2 = isset($order->products[1]) ? $order->products[1] : null;
-        //     $existingProduct3 = isset($order->products[2]) ? $order->products[2] : null;
-        //     $existingProduct4 = isset($order->products[3]) ? $order->products[3] : null;
-
-        //     dd($get,$existingProduct1);
-
-
-        //     $price = data_get($order['products'], '1.price', 0);
-
-        //     $existingProductObject1 = $this->convertArrayToStdClass($existingProduct1);
-        //     // $existingProductObject2 = $this->convertArrayToStdClass($existingProduct2);
-        //     $existingProductObject3 = $this->convertArrayToStdClass($existingProduct3);
-        //     $existingProductObject4 = $this->convertArrayToStdClass($existingProduct4);
-
-
-        //     $inventory = [];
-        //     if ($existingProduct1['type'] == 'dedicated') {
-
-        //         foreach ([$request->ramServer] as $key) {
-        //             $ramVal = $key;
-
-        //             array_push($inventory, $ramVal);
-        //         }
-
-        //         foreach ([$request->disk] as $key) {
-        //             $diskVal = $key;
-
-        //             array_push($inventory, $diskVal);
-        //         }
-        //         foreach ([$request->processor] as $key) {
-        //             $processorVal = $key;
-
-        //             array_push($inventory, $processorVal);
-        //         }
-
-        //         $totalin = 0;
-        //         for ($i = 0; $i < count($inventory[0]); $i++) {
-
-        //             $totalin += $inventory[0][$i];
-        //         }
-
-        //         // $dettol = 0;
-        //         // for ($i = 0; $i < count($inventory[1]); $i++) {
-
-        //         //     $dettol += $inventory[1][$i];
-        //         // }
-        //     } else {
-        //         $totalin = 0;
-        //     }
-
-        //     // dd($totalin);
-
-        //     // if ($existingProduct2) {
-        //     //     // Mengupdate nilai produk yang ada
-        //     //     $existingProduct2['price'] = $request->custom_price;
-        //     //     $existingProduct2['qty'] = $request->custom_qty;
-        //     //     $existingProduct2['price_after_qty'] = $request->custom_qty * $request->custom_price;
-        //     // }
-        //     if ($existingProduct2['id'] == "16") {
-        //         $ramServer = 32;
-        //         $existingProduct2['name_product'] = '128 GB + ' . $totalin + $ramServer;
-        //         $order->save();
-        //     } elseif ($existingProduct2['id'] == "17" || $existingProduct2['id'] == 17) {
-        //         $ramServer = 64;
-        //         $existingProduct2['name_product'] = '128 GB +  ' . $totalin + $ramServer;
-        //     } else {
-
-        //         $ramProduct = new Product(); // Gantilah 'Product' dengan nama model atau entitas yang sesuai
-
-        //         $ramProduct->id = 16;
-        //         $ramProduct->name_product = '128 GB +  ' . $totalin . ' GB';
-        //         $ramProduct->type = 'ram';
-        //         $ramProduct->price = $totalin * 1000;
-        //         $ramProduct->qty = 1;
-        //         $ramProduct->price_after_qty = $totalin * 1000;
-        //     }
-
-        //     // dd($existingProduct2);
-
-        //     // $inventory = [$request->ram,$request->disk,$request->disk];
-        //     $existingProductObject2 = $this->convertArrayToStdClass($existingProduct2);
-
-
-        //     // dd($inventory);
-        //     $newProduct = new Product(); // Gantilah 'Product' dengan nama model atau entitas yang sesuai
-        //     $newProduct->id = $id;
-        //     $newProduct->type = $request->type;
-        //     $newProduct->series = $request->series;
-        //     $newProduct->dimension = $request->dimension;
-        //     $newProduct->serialNumber = $request->serialNumber;
-        //     // $newProduct->inventory = $request->inventory;
-        //     $newProduct->entryDate = $request->entryDate;
-        //     $newProduct->serverLabel = $request->serverLabel;
-        //     $newProduct->name_product = $request->series;
-        //     $newProduct->price = 0;
-        //     $newProduct->qty = 1;
-        //     $newProduct->price_after_qty = 0;
-
-        //     $newProduct->inventory = $inventory;
-        //     // dd($order['created_at']);
-        //     // $startDate = $order['created_at'];
-        //     // $startDate = ($order['created_at'])->formatLocalized('%d %B %Y %H:%M');
-        //     // dd($nganu);
-        //     if ($existingProduct1['type'] == 'dedicated' ) {
-        //         $newProduct->startDate = $order['created_at'];
-        //     }
-
-        //     // dd($order['created_at']->addDays(30 * $request->bulan));
-        //     if ($request->payment == "lunas" || $existingProduct1['type'] == 'colocation') {
-        //         $newProduct->endDate = $order['created_at']->addDays(30 * $request->bulan);
-        //     }
-
-
-
-
-        //     if ($existingProduct1['type'] == 'dedicated') {
-        //         $order->products = [$existingProductObject1, $existingProductObject2, $existingProductObject3, $existingProductObject4, $newProduct];
-        //         // $newProduct->qty = 1;
-        //     } elseif ($totalin == 0) {
-        //         $order->products = [$existingProductObject1, $existingProductObject2, $existingProductObject3, $existingProductObject4, $newProduct];
-        //     } else {
-        //         $order->products = [$existingProductObject1, $existingProductObject2, $existingProductObject3, $existingProductObject4, $newProduct, $ramProduct];
-        //     }
-
-        //     // $newProduct->price_after_qty = $totalCost;
-        //     // $newProduct->price = 350000;
-
-        //     // $customTotal = $request->custom_price * $request->custom_qty;
-        //     // Mengupdate nilai total pesanan
-        //     // $order->total_price += $customTotal;
-
-
-        //     $order->save();
-        // }
     }
 
     private function calculateTotalPrice(Order $order)
@@ -774,24 +467,6 @@ class OrderStatusController extends Controller
 
         return view('order.admin.show', compact('status2'));
     }
-
-    // public function downloadPDF($id)
-    // {
-    //     //get data yang akan ditampilkan pada pdf
-    //     //data yang dikirim ke PDF wajib array
-    //     // toArray : merubah fungsi dari model apapun menjadi sebuah array
-    //     // first = mengambil data haya satu
-    //     $order = Order::where('id',$id)->first()->toArray();
-
-    //     // ketika data dipanggil di blade pdf,akan dipanggil dengan $apa
-    //     view()->share('order',$order);
-
-    //     // lokasi dan nama blade yang akan didownload ke pdf serta data yang akan ditampilkan 
-    //     $pdf = PDF::loadView('order.user.download',$order);
-
-    //     // ketika didownload nama file apa
-    //     return $pdf->download('Bukti Pembelian.pdf');   
-    // }
 
     public function search(Request $request)
     {
@@ -862,24 +537,39 @@ class OrderStatusController extends Controller
         // $product = Product::where('created_at',$order)->first();
 
         // format assoc dimasukkan ke array penampung sebelumnya
+        $serverProducts = [];
+        foreach ($orders as $order) {
+            // dd($orders);
+            // $serverData = data_get(last($order['products']),'', 1);
+            $serverData = last($order['products']);
+            $countServer = count($order['products']) - 2;
+            $serverType = data_get($serverData, 'type', false);
+            if ($serverType == 'freeze') {
+                $freezeServer = $order['products'][$countServer];
+                array_push($serverProducts, $freezeServer);
+            } else {
+                array_push($serverProducts, $serverData);
+            }
+        }
+        $validate = data_get($serverProducts, '0', false);
+        if($validate == false){
+            $paginateProducts = $this->paginate($serverProducts);
+            
+        }else{
+            $paginateProducts = $this->paginate($serverProducts);
+            // $userData = $this->paginate($userData);
+            // dd([$userData]);
+
+        }
 
 
-        return view('order.server.index', compact('products', 'orders', 'userData', 'dataCompile', 'statusData'));
+        return view('order.server.index', compact('products', 'orders', 'userData', 'dataCompile', 'serverProducts','statusData','validate','paginateProducts'));
+        
     }
 
     public function searchData(Request $request)
     {
-        // Anuman
-        // $query= "SELECT * FROM students
-        //             WHERE
-        //         nama LIKE '%$keyword%' OR
-        //         nis LIKE '%$keyword%' OR
-        //         rombel LIKE '%$keyword%' OR
-        //         rayon LIKE '%$keyword%' OR
-        //         status LIKE '%$keyword%'
-        //     ";
-
-        //     return query($query);
+        // anomali
 
         $input = $request->input('search');
 
@@ -902,9 +592,9 @@ class OrderStatusController extends Controller
         $count = 0;
         $countArr = count($bogorAsnet);
         if ($bogorAsnet !== null) {
-
+            
             for ($i = 0; $i < $countArr; $i++) {
-
+                
                 // dd(count($bogorAsnet),$bogorAsnet[$i]['datacenter'][0]['rack']);
                 if ($bogorAsnet[$i]['datacenter'][0]['rack'] == $input) {
                     // dd($datacenter['rack']);    
@@ -918,10 +608,10 @@ class OrderStatusController extends Controller
                 }
             }
         }
-
-
-
-
+        
+        
+        
+        
         //proses ambil data
         $products = Product::orderBy('name', 'ASC')->simplePaginate(5);
         // $orders = Order::with('user')->simplePaginate(5);\
@@ -936,59 +626,48 @@ class OrderStatusController extends Controller
             array_push($arron, $countArr);
         }
         // dd($arron[0]['type']);
-
+        
         $dataCompile = [];
         for ($i = 0; $i < count($arron); $i++) {
             if ($arron[$i]['type'] == 'dell' || $arron[$i]['type'] == 'HP' || $arron[$i]['type'] == 'supermicro') {
-
+                
                 array_push($dataCompile, $orders[$i]);
             }
         }
         $statusData = [];
-        // dd($statusData[1][]);
         for ($i = 0; $i < count($dataCompile); $i++) {
-
+            
             $datastatus = $dataCompile[$i]['id'];
             $statusId = Order_status::where('order_id', $datastatus)->first();
             array_push($statusData, $statusId);
         }
-
+        
         // dd
         $userData = [];
         for ($i = 0; $i < count($dataCompile); $i++) {
-
+            
             $dataUser = $dataCompile[$i]['user_id'];
             $userId = User::where('id', $dataUser)->first();
             array_push($userData, $userId);
         }
-
+        
         array_push($userData, $statusData);
         // $product = Product::where('created_at',$order)->first();
-
+        
         // format assoc dimasukkan ke array penampung sebelumnya
-
-
+        
+        
         $title = 'Delete Data Server!';
         $text = "Are you sure you want to delete?";
         confirmDelete($title, $text);
-
+        // dd($bogorAsnet);
+        
         return view('internal.bogor', compact('bogorAsnet', 'products', 'orders', 'userData', 'dataCompile', 'statusData'));
     }
-
+    
     public function searchData2(Request $request)
     {
         // Anuman
-        // $query= "SELECT * FROM students
-        //             WHERE
-        //         nama LIKE '%$keyword%' OR
-        //         nis LIKE '%$keyword%' OR
-        //         rombel LIKE '%$keyword%' OR
-        //         rayon LIKE '%$keyword%' OR
-        //         status LIKE '%$keyword%'
-        //     ";
-
-        //     return query($query);
-
         $input = $request->search;
 
         $datacenter = Order::All();
@@ -1002,11 +681,6 @@ class OrderStatusController extends Controller
                 array_push($jakartaCyber, $jakarta);
             }
         }
-        // array_push();
-        // maybe it hep 
-
-        // $size = count(collect($request)->get('id'));
-        // 
         $count = 0;
         $countArr = count($jakartaCyber);
         if ($jakartaCyber !== null) {
@@ -1574,7 +1248,7 @@ class OrderStatusController extends Controller
                 $status2->save();
                 if ($request->has('endData')) {
 
-                    return redirect()->route('status.new_status', ['id' => $status2->id])->with('success', 'Berhasil Menambahkan Data');
+                    return redirect()->route('status.status', ['id' => $status2->id])->with('success', 'Berhasil Menambahkan Data');
                 } else {
                     return redirect()->route('status.show', ['id' => $status2->id])->with('success', 'Berhasil Mengupload Data!');
                 }
@@ -1601,40 +1275,11 @@ class OrderStatusController extends Controller
                 } else if ($status2->data == 4) {
                     $status2->update([$status2->status = 'Done']);
                 }
-                // $intDate = Product::where('id',$id)
-                // ->increment('count', 1, ['increased_at' => Carbon::now()]);
-                // redirect ke html order data
-                // route digunakan untuk memindahkan suatu ke page yang lain jika ingin menambahkan notif ke tempat lain bisa di ganti ke order.tambah atau order.edit
-                // return redirect()->route('order.index')->with('success','Berhasil mengubah data produk!')->compact('dateInc');
                 return redirect()->route('status.dedicated')->with('success', 'Berhasil mengubah status SPK Client!');
             } elseif ($request->has('access')) {
                 // Jika ya, tambahkan nilai access
                 // suspend menu
                 // golden 
-                // if($request->has('userName')){
-
-                //     $orderBulan = Order::where('id',$status2['order_id'])->first();
-                //     $orderBulan['bulan'] = "$status2->data";
-                //     $orderBulan['votes'] = 1;
-                //     $orderBulan->save();
-                //     // dd($orderBulan);
-
-                //     $access = $status2->access = 2;
-
-                //     $status2->update(['access' => $access]);
-                //     $status2->update(['payment' => 1]);
-                //     $status2->update(['data' => 4]);
-
-                //     $orderBulan['user_id'] = $request->userName;
-                //     $dataUser = User::where('id',$request->userName)->first();
-                //     $orderBulan['name_customer'] = $dataUser['name'];
-
-                //     $orderBulan->save();
-
-
-
-                //     return redirect()->route('status.dedicated')->with('success', 'Berhasil Mengubah Menu Sewa!');
-                // }
 
                 if ($request->input('access') == 2 && $request->input('freeze') == 1 && $request->input('terminated') == 1) {
 
@@ -1759,7 +1404,7 @@ class OrderStatusController extends Controller
 
                         $orderTerminated['products'] = $priceUpdate;
 
-                        dd($productPrice, $priceUpdate);
+                        // dd($productPrice, $priceUpdate);
 
                         $dataUser = User::where('id', $request->userName)->first();
 
@@ -1879,7 +1524,7 @@ class OrderStatusController extends Controller
         $products = Product::orderBy('name', 'ASC')->simplePaginate(5);
         // $orders = Order::with('user')->simplePaginate(5);\
         // $orders = Order::all();
-        $perPage = request('perPage', 100); // Default to 10 items per page
+        $perPage = request('perPage', 5); // Default menjadi 5 items perpage
         // $orders = Order::simplePaginate($perPage);
         $orders = Order::All();
 
@@ -1889,36 +1534,36 @@ class OrderStatusController extends Controller
             $countArr = last($order['products']);
             array_push($arron, $countArr);
         }
-        // dd($arron[0]['type']);
-
+        
         $dataCompile = [];
         for ($i = 0; $i < count($arron); $i++) {
             if ($arron[$i]['type'] == 'dell' || $arron[$i]['type'] == 'HP' || $arron[$i]['type'] == 'supermicro') {
-
+                
                 array_push($dataCompile, $orders[$i]);
             }
         }
         $statusData = [];
         // dd($statusData[1][]);
         for ($i = 0; $i < count($dataCompile); $i++) {
-
+            
             $datastatus = $dataCompile[$i]['id'];
             $statusId = Order_status::where('order_id', $datastatus)->first();
             array_push($statusData, $statusId);
         }
-
+        
         // dd
         $userData = [];
         for ($i = 0; $i < count($dataCompile); $i++) {
-
+            
             $dataUser = $dataCompile[$i]['user_id'];
             $userId = User::where('id', $dataUser)->first();
             array_push($userData, $userId);
         }
-
+        // dd($userData);
+        
         // dd($arron,$orders,$dataCompile);
         array_push($userData, $statusData);
-        // dd($userData);
+        // dd($userData,$dataCompile,$statusData);
 
         $title = 'Delete Server!';
         $text = "Are you sure you want to delete?";
@@ -1927,13 +1572,44 @@ class OrderStatusController extends Controller
         // if(confirmDelete($title, $text)){
         //     return redirect()->route('detail_server.delete',$request->deletePop);
         // };
+        $serverProducts = [];
+        foreach ($orders as $order) {
+            // dd($orders);
+            // $serverData = data_get(last($order['products']),'', 1);
+            $serverData = last($order['products']);
+            $countServer = count($order['products']) - 2;
+            $serverType = data_get($serverData, 'type', false);
+            if ($serverType == 'freeze') {
+                $freezeServer = $order['products'][$countServer];
+                array_push($serverProducts, $freezeServer);
+            } else {
+                array_push($serverProducts, $serverData);
+            }
+        }
+        $validate = data_get($serverProducts, '0', false);
+        if($validate == false){
+            $paginateProducts = $this->paginate($serverProducts);
+            
+        }else{
+            $paginateProducts = $this->paginate($serverProducts);
+        }
+        
+        // $serverProducts->withPath('');
 
-        // dd($userData);
-        // mannggil html yang ada di folder resources/views/product.index.blade.php
-        //compact : mengirim data ke blade 
-        return view('order.server.index', compact('products', 'orders', 'userData', 'dataCompile', 'statusData'));
+        return view('order.server.index', compact('products', 'orders', 'userData', 'dataCompile', 'serverProducts','statusData','validate','paginateProducts'));
     }
-
+/**
+     * Paginate an array of items.
+     *
+     * @return LengthAwarePaginator         The paginated items.
+     */
+    private function paginate($items, $perPage = 5, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+    
     public function singleServer(Request $request, $id)
     {
         //proses ambil data
@@ -1949,10 +1625,9 @@ class OrderStatusController extends Controller
         foreach ($orders as $order) {
             // $totalArr = array_count_values($order['products']);
             $lastProduct = last($order['products']);
-            if($lastProduct['type'] == "freeze"){
-                $countArr = data_get($order['products'],4,false);
-            }
-            else{
+            if ($lastProduct['type'] == "freeze") {
+                $countArr = data_get($order['products'], 4, false);
+            } else {
                 $countArr = last($order['products']);
             }
             array_push($arron, $countArr);
@@ -2251,11 +1926,12 @@ class OrderStatusController extends Controller
         //
         $products = Product::all();
         $order = Order::find($id);
-        
+
+        $countProducts = count($order['products']) - 2 ;
         $lastOrder = last($order['products']);
-        if($lastOrder['type'] = "freeze"){
-            $PO = $order['products'][4];
-        }else{
+        if ($lastOrder['type'] == "freeze") {
+            $PO = $order['products'][$countProducts];
+        } else {
             $PO = $lastOrder;
         }
         return view('order.server.edit', compact('products', 'order', 'PO'));
@@ -2283,31 +1959,8 @@ class OrderStatusController extends Controller
 
             $existingProduct1 = isset($order->products[0]) ? $order->products[0] : null;
             $existingProduct2 = isset($order->products[1]) ? $order->products[1] : null;
-            $existingProduct3 = isset($order->products[2]) ? $order->products[2] : null;
-            $existingProduct4 = isset($order->products[3]) ? $order->products[3] : null;
 
 
-
-            // if ($existingProduct4) {
-            //     $existingProductObject1 = $this->convertArrayToStdClass($existingProduct1);
-            //     $existingProductObject3 = $this->convertArrayToStdClass($existingProduct3);
-            //     $existingProductObject4 = $this->convertArrayToStdClass($existingProduct4);
-
-            //     $order->products = [$existingProductObject1, $existingProductObject2, $existingProductObject3, $existingProductObject4];
-            // } elseif ($existingProduct3) {
-            //     $existingProductObject1 = $this->convertArrayToStdClass($existingProduct1);
-            //     $existingProductObject3 = $this->convertArrayToStdClass($existingProduct3);
-
-            //     $order->products = [$existingProductObject1, $existingProductObject2, $existingProductObject3];
-            // } elseif ($existingProduct2) {
-            //     $existingProductObject1 = $this->convertArrayToStdClass($existingProduct1);
-
-            //     $order->products = [$existingProductObject1, $existingProductObject2];
-            // }
-            // foreach ($request->inventory as $key => $value) {
-            // Product::create($value);
-            // }
-            // $arrInventory = array_count_values($request->ram);
             $inventory = [];
             $cpuCheck = data_get([$request->processor][0], '0', 1);
 
@@ -2400,10 +2053,15 @@ class OrderStatusController extends Controller
             $newProduct->inventory = $inventory;
             // dd($order['created_at']);
             $startDate = ($order['created_at'])->formatLocalized('%d %B %Y %H:%M');
-            // dd($nganu);
+            // dd($nganu);   
             if ($existingProduct1['type'] == 'dedicated') {
-                $newProduct->startDate = $startDate;
-            }
+                    $newProduct->startDate = $order['created_at']->addDays(30 * $order['bulan']);
+                }
+
+                // dd($order['created_at']->addDays(30 * $order['bulan']));
+                if ($request->payment == "lunas" || $existingProduct1['type'] == 'colocation') {
+                    $newProduct->endDate = $order['created_at']->addDays(30 * $order['bulan']);
+                }
 
             $orderProducts = $order['products'];
             array_pop($orderProducts);
@@ -2538,7 +2196,7 @@ class OrderStatusController extends Controller
             Alert::success('success', 'Berhasil menambah nilai accessf!');
 
 
-            return redirect()->route('status.dedicated')->with('success', 'Berhasil mengubah data server 1!')->alert('Title', 'Lorem Lorem Lorem', 'success');;
+            return redirect()->route('status.dedicated')->with('success', 'Berhasil mengubah data server!');
         } else {
 
             $status2 = Order_status::find($id);
@@ -2600,11 +2258,6 @@ class OrderStatusController extends Controller
                 } else if ($status2->data == 4) {
                     $status2->update([$status2->status = 'Done']);
                 }
-                // $intDate = Product::where('id',$id)
-                // ->increment('count', 1, ['increased_at' => Carbon::now()]);
-                // redirect ke html order data
-                // route digunakan untuk memindahkan suatu ke page yang lain jika ingin menambahkan notif ke tempat lain bisa di ganti ke order.tambah atau order.edit
-                // return redirect()->route('order.index')->with('success','Berhasil mengubah data produk!')->compact('dateInc');
                 return redirect()->route('status.dedicated')->with('success', 'Berhasil mengubah status SPK Client!');
             } elseif ($request->has('access')) {
                 // Jika ya, tambahkan nilai access
@@ -2640,7 +2293,7 @@ class OrderStatusController extends Controller
 
             Alert::success('success', 'Berhasil menambah nilai access1!');
 
-            return redirect()->route('status.show', ['id' => $status2->id])->with('success', 'Berhasil menambah nilai accesso!');
+            return redirect()->route('status.show', ['id' => $status2->id])->with('success', 'Berhasil menambah nilai access!');
         }
     }
     /**
@@ -2694,18 +2347,19 @@ class OrderStatusController extends Controller
             array_push($sewaEnd, $sewaAdd);
         }
 
-        $sewaMake = [];
+        $sewaProducts = [];
         for ($i = 0; $i < count($sewaEnd); $i++) {
             # code...
             $sewaGet = Order::where('id', $sewaEnd[$i])->first();
-            array_push($sewaMake, $sewaGet);
+            array_push($sewaProducts, $sewaGet);
         }
 
 
-        // dd($get1,$sewaEnd,$sewaMake);
+        // dd($get1,$sewaEnd,$sewaProducts);
+        
 
         // $user = User::OrderBy('id', 'ASC')->simplePaginate(100);
-        return view('order.client.sewa', compact('get1', 'sewaMake'));
+        return view('order.client.sewa', compact('get1', 'sewaProducts'));
     }
     public function sewa($id)
     {
@@ -2731,76 +2385,6 @@ class OrderStatusController extends Controller
         return view('order.admin.sewa', compact('order', 'userGet', 'user', 'status1', 'empty', 'userEntry'));
     }
 
-    public function sewaUser($id)
-    {
-
-        $order = Order::where('id', $id)->first();
-        $userGet = User::where('id', $order['user_id'])->first();
-        $user = User::where('role', 'user')->simplePaginate(100);
-        $status1 = Order_status::where('order_id', $id)->first();
-        // sewa Setting for user in admin page
-
-
-        // $user = User::OrderBy('id', 'ASC')->simplePaginate(100);
-        return view('order.user.sewa', compact('order', 'userGet', 'user', 'status1'));
-    }
-    public function sewaEntry(Request $request, $id)
-    {
-
-        $order = Order::where('id', $id)->first();
-        $user = User::where('id', $request->userName)->first();
-        $sewaArr = [];
-        $sewa = [
-            "id" => 1,
-            "type" => "sewa",
-            "bulan" => $request->bulan,
-        ];
-        array_push($sewaArr, $sewa);
-
-        $existingEntry = $user['entryData'];
-        $existingEntry1 = data_get($user['entryData'], '0', 1);
-        $existingEntry2 = data_get($user['entryData'], '1', 1);
-        $data = $user['entryData'];
-
-        // array_splice($data, 4);
-        $data[0][1] = [
-            "bulan" => $request->bulan,
-        ];
-
-        // $data->save();
-        $user['entryData'] = $data;
-        // dd($user['entryData'],$existingEntry1,$user,$data);
-        // if($existingEntry2 == 1){
-
-        //     $user['entryData'] = [$existingEntry1,$sewaArr];
-        // }else{
-
-        // }
-        // $existingEntry1[1]['bulan'];
-
-        $user->save();
-        // buat produk dengan type sewa atau status sewa ?
-
-        $status1 = Order_status::where('order_id', $id)->first();
-        $order['user_id'] = $request->userName;
-
-        $order['name_customer'] = $user['name'];
-        // if($status1['payment'] == 0){
-
-        //     $order['bulan'] = $request->bulan;
-        //     $order['votes'] = $request->bulan;
-        // }
-
-
-        $order->save();
-
-
-        $status1['payment'] = -1;
-
-        $status1->save();
-        // $user = User::OrderBy('id', 'ASC')->simplePaginate(100);
-        return redirect()->route('order.index')->with('success', 'Berhasil Mengajukan Sewa');
-    }
     public function sewaUpdate(Request $request, $id)
     {
 
@@ -2821,7 +2405,7 @@ class OrderStatusController extends Controller
         // }
 
 
-        if ($status1['payment'] > 0) {
+        // if ($status1['payment'] > 0) {
 
             $votes = $order['votes'];
             $dataGet = $oldUser['entryData'];
@@ -2830,12 +2414,12 @@ class OrderStatusController extends Controller
             // $oldUser->save();
             // dd($dataGet);
             $oldUser->save();
-        }
+        // }
 
         // dd($request->userName);
         $order['name_customer'] = $user['name'];
 
-        if ($status1['payment'] < 1) {
+        // if ($status1['payment'] < 1) {
 
             // $dataEntry = 
 
@@ -2860,7 +2444,7 @@ class OrderStatusController extends Controller
             } else {
                 $order['votes'] = 1;
             }
-        }
+        // }
 
         $order->save();
 
@@ -2896,31 +2480,55 @@ class OrderStatusController extends Controller
         // dd($movies);
         return response()->json($movies);
     }
-    // public function sewaUpdate(Request $request,$id){
+    
+    public function votesUpdate(Request $request,$id){
 
-    //     $order = Order::where('id', $id)->first();
-    //     $user = User::where('id',$request->userName)->first();
-    //     // buat produk dengan type sewa atau status sewa ?
+        $request->validate([
+            'bulanSelection' => 'required',
+        ]);
 
-    //     $status1 = Order_status::where('order_id', $id)->first();
-    //     $order['user_id'] = $request->userName;
+        $order = Order::where('id', $id)->first();
+        $orderStatus = Order_status::where('order_id', $id)->first();
+        
+        $votes = $request->bulanSelection;
+        $votesOp = $votes - $order['votes'];
+        $existingTotal = $order['total_price'];
 
-    //     $order['name_customer'] = $user['name'];
-    //     if($status1['payment'] == 0){
+        if($orderStatus['payment'] < 0){
 
-    //         $order['bulan'] = $request->bulan;
-    //         $order['votes'] = $request->bulan;
-    //     }
+            $productDc = $order['products'][0]['price'];
+            $orderStatus['payment'] = $votes * -1;
+            // dd($orderStatus);
+    }
+    else{
+        
+        
+        if($order['bulan'] == 12){
+            $productPrice = $order['products'][0]['price_after_qty'] + 300000;
+            
+        }else{
+            $productPrice = $order['products'][0]['price_after_qty'];
+        }
 
+        if($order['datacenter'][0]['datacenter'] == "Jakarta"){
+            $productDc = $productPrice + 750000;
+        }
+        else{
+            $productDc = $productPrice;
+        }
+        $orderStatus['payment'] = $votes;
+        
+    }
+        $productTotal = $productDc * $votesOp;
+        
+        // dd($votes,$productPrice);
+        $totalEnd = $existingTotal + $productTotal;
 
-    //     $order->save();
+        $order['votes'] = $votes;
+        $order['total_price'] = $totalEnd;
+        $order->save();
+        $orderStatus->save();
 
-
-    //     $status1['payment'] = 0;
-
-    //     $status1->save();
-    //            // $user = User::OrderBy('id', 'ASC')->simplePaginate(100);
-    //     return redirect()->route('status.dedicated')->with('updated','Berhasil mengupdate data');
-
-    // }
+        return redirect()->back()->with('success','Data Votes Terupdate !');
+    }
 }

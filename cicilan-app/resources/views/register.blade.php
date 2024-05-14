@@ -5,7 +5,7 @@
         body {
             margin: 0;
             padding: 0;
-            background: linear-gradient(to bottom right, #3498db, #2c3e50);
+            background: linear-gradient(to bottom right,aqua, #3498db, #2c3e50);
             font-family: 'Arial', sans-serif;
             /* font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; */
             color: #fff;
@@ -79,7 +79,17 @@
             border-radius: 5px;
             transition: 0.5s;
         }
+        .content-flex{
+            display: flex;
+            justify-content: center;
+            
+        }
     </style>
+
+<div class="content-flex">
+    @include('sweetalert::alert')
+
+
     <div class="card mt-5 p-4">
         <form action="{{ route('register.account-create') }}" method="POST" class="mx-1 mx-md-4">
             @csrf
@@ -609,11 +619,11 @@
 		<option data-countryCode="ZW" value="263">Zimbabwe (+263)</option>
 	</optgroup>
 
-</select> --}}
+    </select> --}}
 
             {{-- <x-flag-country-us class="w-6 h-6"/> --}}
 
-<hr>
+    <hr>
             {{-- <h3><i class="fa-regular fa-exclamation pe-2" style="margin-left:10px;margin-right: 5px;">  </i>Account Security</h3> --}}
             
         {{-- <h3><i class="fa-regular fa-exclamation pe-2" style="margin-left:10px;margin-right: 5px;">  </i>Account Security</h3> --}}
@@ -624,7 +634,7 @@
             <div class="mb-3">
 
                 {{-- <input type="password" name="password" id="password" class="form-control" placeholder="Password"> --}}
-                <select name="money" id="money" class="form-control" style="padding-right: 300px;">
+                <select name="money" id="money" class="form-control" style="padding-right: 60%;">
                     <option value="IDR">
                         <p><i class="fa-solid fa-file-lines pe-2"></i>💵 </p>IDR
                     </option>
@@ -632,12 +642,10 @@
                 </select>
             </div>
         </div>
-        <hr>
-        <h3> Account Security</h3>
         <div class="row ">
-            <div class="col-sm-6 w-50 ">
+            <div class="col-sm-6 w-50 " >
                 <div class="group mt-3">
-                    <input type="text" id="password" placeholder="Password*" name="password" class="form-control" required/>
+                    <input type="text" id="password" placeholder="Password*" name="password" class="form-control" />
                     {{-- <div class="btn" style="border-color:black;">
                          Generate Password
                      </div> --}}
@@ -654,9 +662,9 @@
                     </div>
             </div>
 
-                <div class="mb-3 mt-2 w-50" style="">
+                <div class="mb-3 mt-2 w-50" style="" >
                     <input type="password" name="confirm_password" id="confirm_password" class="form-control"
-                        placeholder="Confirm Password">
+                        placeholder="Confirm Password" >
                     <div class="group mt-3">
                         <div class="power-container">
                             <div id="power-point"></div>
@@ -682,8 +690,9 @@
         <!-- Button trigger modal -->
 
     </div>
-    
-@endsection
+</div>
+
+    @endsection
 @push('script')
     <script>
         // script.js 

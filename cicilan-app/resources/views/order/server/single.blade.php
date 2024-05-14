@@ -3,7 +3,9 @@
 
 {{-- isi bagian yield --}}
 @section('content')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"
+        integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         table {
             background: whitesmoke;
@@ -24,7 +26,7 @@
     <div class="jumbotron mt-2" style="padding:0px;">
         <div class="container">
             <h3><b>Data Server</b></h3>
-            <p class="lead"><a href="/dashboard">Home</a>/<a href="{{ route('admin.order.data') }}">Data single</a>/<a
+            <p class="lead"><a href="/dashboard">Home</a>/<a
                     href="#">Data Server</a></p>
         </div>
     </div>
@@ -34,15 +36,14 @@
         foreach ($orders as $order) {
             // $serverData = data_get(last($order['products']),'', 1);
             $serverData = last($order['products']);
-            $serverType = data_get($serverData,'series',false);
+            $serverType = data_get($serverData, 'series', false);
             // dd(last($order['products']));
             // dd($serverData);
-            if($serverData['type'] == "freeze"){
-                $serverGet = data_get($order['products'],'4',false);
-                array_push($serverProducts,$serverGet);
-            }
-            else {
-            // elseif $serverType !== false) {
+            if ($serverData['type'] == 'freeze') {
+                $serverGet = data_get($order['products'], '4', false);
+                array_push($serverProducts, $serverGet);
+            } else {
+                // elseif $serverType !== false) {
                 array_push($serverProducts, $serverData);
                 // $orderData = data_get($order,$serverData);
                 // array_push($orderProducts, $orderData);
@@ -56,18 +57,17 @@
         // dd($orderProducts)
         // $find = Order::find($serverProducts['id']);
         // dd($serverProducts);
-
     @endphp
 
-    
-    
-{{-- <div class="d-flex justify-content-end">
+
+
+    {{-- <div class="d-flex justify-content-end">
     <a class="btn btn-primary" href="{{ route('detail_server.create', $products[1]['id']) }}">Tambah data</a>
 </div> --}}
-@if (Session::get('success'))
-<br>
-@include('sweetalert::alert')
-<div class="alert alert-success">
+    @if (Session::get('success'))
+        <br>
+        @include('sweetalert::alert')
+        <div class="alert alert-success">
             {{ Session::get('success') }}
         </div>
     @endif
@@ -93,15 +93,16 @@
                             <th>serialNumber</th>
                             <th>Additional</th>
                             <th>Start Server</th>
-                            <th>Expired Date</th>
+                            <th>End Date</th>
                             <th>Label</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php$no = 1;
+                        @php
+$no = 1;
 
-                                            @endphp 
+                                                                    @endphp ?>
                         @foreach ($serverProducts as $item => $value)
                             {{-- @foreach ($dataCompile as $item) --}}
                             {{-- @php
@@ -121,29 +122,20 @@
                                 // Arr::get($my_arr, '*.lower'); // null
                                 if ($endPayment !== 1 && $start !== 1) {
                                     $endDate = Carbon\Carbon::parse($endPayment)->formatLocalized('%d %B %Y %H:%M');
-                                } elseif($endPayment !== 1 && $start == 1){
-                                    $endDate = Carbon\Carbon::parse($endPayment)
-                                    ->formatLocalized('%d %B %Y %H:%M');
-                                        // ->addDays(30 * )
-                                }
-                                 elseif($endPayment == 1 && $start == 1)
-                                 {
-                                    $endDate = Carbon\Carbon::parse($entry)
-                                        ->addDays(30)
-                                        ->formatLocalized('%d %B %Y ');
-                                    }
-                                    else
-                                    {
+                                } elseif ($endPayment !== 1 && $start == 1) {
+                                    $endDate = Carbon\Carbon::parse($endPayment)->formatLocalized('%d %B %Y %H:%M');
+                                    // ->addDays(30 * )
+                                } elseif ($endPayment == 1 && $start == 1) {
+                                    $endDate = Carbon\Carbon::parse($entry)->addDays(30)->formatLocalized('%d %B %Y ');
+                                } else {
                                     $endDate = Carbon\Carbon::parse($start)
                                         ->addDays(30)
                                         ->formatLocalized('%d %B %Y %H:%M');
-
                                 }
                                 if ($entry !== 1 && $start == 1) {
                                     $startDate = Carbon\Carbon::parse($entry)->formatLocalized('%d %B %Y %H:%M');
-                                }else{
+                                } else {
                                     $startDate = Carbon\Carbon::parse($start)->formatLocalized('%d %B %Y %H:%M');
-
                                 }
 
                             @endphp
@@ -187,7 +179,8 @@
                                                         @elseif($i == 2)
                                                             <div class="row" style="flex-wrap:unset;margin:0px 0px;">
                                                                 <p class="">(+) {{ $value['inventory'][$i][$x] }}
-                                                                    (CPU) </p>
+                                                                    (CPU)
+                                                                </p>
                                                             </div>
                                                         @endif
 
@@ -211,17 +204,25 @@
                                 {{-- <td>{{ $value['entryDate'] }}</td> --}}
                                 @if ($start !== 1 && $endPayment == 1)
                                     <td>{{ $startDate }}</td>
-                                    <td>{{ $endDate }} (Pembelian Perbulan)</td>
+                                    <td>{{ $endDate }} 
+                                        {{-- (Pembelian Perbulan) --}}
+                                    </td>
                                 @elseif($start !== 1 && $endPayment !== 1)
-                                <td>{{ $startDate }}</td>
-                                @if ($liveDate == $endDate)
-                                <td>{{ $endDate }} (Dalam Sebulan akan beralih ke <b>Colocation</b>)</td>
-                                @else
-                                <td>{{ $endDate }} (Pembelian Lunas)</td>
-                                @endif
+                                    <td>{{ $startDate }}</td>
+                                    @if ($liveDate == $endDate)
+                                        <td>{{ $endDate }}
+                                             {{-- (Dalam Sebulan akan beralih ke <b>Colocation</b>) --}}
+                                            </td>
+                                    @else
+                                        <td>{{ $endDate }} 
+                                            {{-- (Pembelian Lunas) --}}
+                                        </td>
+                                    @endif
                                 @else
                                     <td>{{ $startDate }}</td>
-                                    <td>{{$endDate}} (Pembayaran Colocation)</td>
+                                    <td>{{ $endDate }} 
+                                        {{-- (Pembayaran Colocation) --}}
+                                    </td>
                                 @endif
                                 <td>{{ $value['serverLabel'] }}</td>
 
@@ -232,23 +233,8 @@
                                     {{-- <a class="btn btn-primary" href="{{ route('detail_server.create', $item['id']) }}" style="margin:0px 10px;">Tambah</a> --}}
                                     <a href="{{ route('detail_server.edit', $value['id']) }}"
                                         class="btn btn-success form-control">Edit</a>
-                                        <a href="{{ route('detail_server.delete', $value['id']) }}" class="btn btn-danger form-control mt-2" data-confirm-delete="true">Delete</a>
-
-                                    {{-- method delete tidak bisa digunakan di href harus pakai form --}}
-                                    {{-- <form action="{{ route('detail_server.delete', $value['id']) }}" method="post"
-                                        class="mt-2">
-                                        <input type="number" value="{{$value['id']}}" name="deletePop" hidden>
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger form-control">Hapus</button>
-                                    </form> --}}
-                                </td>
-                                {{-- @foreach ($item->status as $orderStatus) --}}
-                                {{-- <td>
-
-                    
-                            </td> --}}
-                                {{-- @endforeach --}}
+                                    <a href="{{ route('detail_server.delete', $value['id']) }}"
+                                        class="btn btn-danger form-control mt-2" data-confirm-delete="true">Delete</a>
 
                             </tr>
                         @endforeach
@@ -320,7 +306,7 @@
                 </table>
             </div>
         </div>
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-end mt-3">
             @if ($products->count())
                 {{ $products->links() }}
             @endif

@@ -3,7 +3,9 @@
 
 {{-- isi bagian yield --}}
 @section('content')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"
+        integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         table {
             background: whitesmoke;
@@ -20,63 +22,42 @@
             background: whitesmoke;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 5);
         }
+        .hidden{
+            display: none;
+        }
     </style>
     <div class="jumbotron mt-2" style="padding:0px;">
         <div class="container">
             <h3><b>Data Server</b></h3>
-            <p class="lead"><a href="/dashboard">Home</a>/<a href="{{ route('admin.order.data') }}">Data single</a>/<a
+            <p class="lead"><a href="/dashboard">Home</a>/<a
                     href="#">Data Server</a></p>
         </div>
     </div>
     <form action="{{ route('detail_server.search') }}" method="GET">
 
         <div class="form-inline">
-            <div class="input-group w-25" data-widget="sidebar-search">
+            <div class="input-group w-75" data-widget="sidebar-search">
                 <input class=" form-control" name="search" type="date" placeholder="Search" aria-label="Search">
                 <div class="input-group-append">
                     <button class="btn btn-sidebar" style="background: whitesmoke;">
                         <i class="fas fa-search fa-fw"></i>
                     </button>
                 </div>
-                <a href="{{ route('detail_server.data') }}" class="btn btn-danger w-25 " style="margin-left:5%;border-radius:5px;">reset</a>
-      
+                <a href="{{ route('detail_server.data') }}" class="btn btn-danger"
+                    style="margin-left:5%;border-radius:5px;">reset</a>
+
             </div>
-          </form>
-    @php
-        $orderProducts = [];
-        $serverProducts = [];
-        foreach ($orders as $order) {
-            // $serverData = data_get(last($order['products']),'', 1);
-            $serverData = last($order['products']);
-            $serverType = data_get($serverData,'series',false);
-            // dd(last($order['products']));
-            // dd($serverData);
-            if ($serverType !== false) {
-                array_push($serverProducts, $serverData);
-                // $orderData = data_get($order,$serverData);
-                // array_push($orderProducts, $orderData);
-                // $serverKe4 = $serverData;
-                // array_push ($orderProducts , $serverData);
-            }
-            // array_push($orderProducts,[$order['id']]);
-            // dd($serverType);
-        }
-        $validate = data_get($serverProducts, '0', false);
-        // dd($orderProducts)
-        // $find = Order::find($serverProducts['id']);
-        // dd($serverProducts);
+    </form>
 
-    @endphp
 
-    
-    
-{{-- <div class="d-flex justify-content-end">
+
+    {{-- <div class="d-flex justify-content-end">
     <a class="btn btn-primary" href="{{ route('detail_server.create', $products[1]['id']) }}">Tambah data</a>
 </div> --}}
-@if (Session::get('success'))
-<br>
-@include('sweetalert::alert')
-<div class="alert alert-success">
+    @if (Session::get('success'))
+        <br>
+        @include('sweetalert::alert')
+        <div class="alert alert-success">
             {{ Session::get('success') }}
         </div>
     @endif
@@ -86,6 +67,7 @@
             {{ Session::get('deleted') }}
         </div>
     @endif
+    {{-- @dd($serverProducts) --}}
 
     @if ($validate !== false)
         @php $no=1; @endphp
@@ -102,16 +84,17 @@
                             <th>serialNumber</th>
                             <th>Additional</th>
                             <th>Start Server</th>
-                            <th>Expired Date</th>
+                            <th>End Date</th>
                             <th>Label</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php$no = 1;
+                        @php
+                            $no = 1;
 
-                                            @endphp 
-                        @foreach ($serverProducts as $item => $value)
+                        @endphp
+                        @foreach ($paginateProducts as $item => $value)
                             {{-- @foreach ($dataCompile as $item) --}}
                             {{-- @php
                     @endphp --}}
@@ -120,39 +103,32 @@
                                 $mytime = Carbon\Carbon::now();
                                 $liveDate = $mytime->formatLocalized('25 February 2026 09:03');
 
-                                $start = data_get($serverProducts, "$item.startDate", 1);
-                                $entry = data_get($serverProducts, "$item.entryDate", 1);
+                                $start = data_get($serverProducts, "$item.startDate", false);
+                                $entry = data_get($serverProducts, "$item.entryDate", false);
                                 // dd($serverProducts);
-                                $inventory = data_get($serverProducts, "$item.inventory", 1);
-                                $endPayment = data_get($serverProducts, "$item.endDate", 1);
+                                $inventory = data_get($serverProducts, "$item.inventory", false);
+                                $endPayment = data_get($serverProducts, "$item.endDate", false);
                                 // dd(count($value['inventory']),count($serverProducts[2]['inventory']));
                                 // dd($serverProducts);
                                 // Arr::get($my_arr, '*.lower'); // null
-                                if ($endPayment !== 1 && $start !== 1) {
-                                    $endDate = Carbon\Carbon::parse($endPayment)->formatLocalized('%d %B %Y %H:%M');
-                                } elseif($endPayment !== 1 && $start == 1){
-                                    $endDate = Carbon\Carbon::parse($endPayment)
-                                    ->formatLocalized('%d %B %Y %H:%M');
-                                        // ->addDays(30 * )
-                                }
-                                 elseif($endPayment == 1 && $start == 1)
-                                 {
-                                    $endDate = Carbon\Carbon::parse($entry)
-                                        ->addDays(30)
-                                        ->formatLocalized('%d %B %Y ');
-                                    }
-                                    else
-                                    {
+                                // jika pembayaran lunas maka
+                                if ($endPayment !== false && $start !== false) {
+                                    $endDate = Carbon\Carbon::parse($endPayment)->formatLocalized('%d %B %Y ');
+                                    // jika pembayaran colocation
+                                } elseif ($endPayment !== false && $start == false) {
+                                    $endDate = Carbon\Carbon::parse($endPayment)->formatLocalized('%d %B %Y ');
+                                    // jika pembayaran perbulan
+                                } elseif ($endPayment == false && $start == false) {
+                                    $endDate = Carbon\Carbon::parse($start)->addDays(30)->formatLocalized('%d %B %Y ');
+                                } else {
                                     $endDate = Carbon\Carbon::parse($start)
                                         ->addDays(30)
-                                        ->formatLocalized('%d %B %Y %H:%M');
-
+                                        ->formatLocalized('%d %B %Y ');
                                 }
-                                if ($entry !== 1 && $start == 1) {
-                                    $startDate = Carbon\Carbon::parse($entry)->formatLocalized('%d %B %Y %H:%M');
-                                }else{
-                                    $startDate = Carbon\Carbon::parse($start)->formatLocalized('%d %B %Y %H:%M');
-
+                                if ($entry !== false && $start == false) {
+                                    $startDate = Carbon\Carbon::parse($entry)->formatLocalized('%d %B %Y ');
+                                } else {
+                                    $startDate = Carbon\Carbon::parse($entry)->formatLocalized('%d %B %Y ');
                                 }
 
                             @endphp
@@ -196,7 +172,8 @@
                                                         @elseif($i == 2)
                                                             <div class="row" style="flex-wrap:unset;margin:0px 0px;">
                                                                 <p class="">(+) {{ $value['inventory'][$i][$x] }}
-                                                                    (CPU) </p>
+                                                                    (CPU)
+                                                                </p>
                                                             </div>
                                                         @endif
 
@@ -220,17 +197,13 @@
                                 {{-- <td>{{ $value['entryDate'] }}</td> --}}
                                 @if ($start !== 1 && $endPayment == 1)
                                     <td>{{ $startDate }}</td>
-                                    <td>{{ $endDate }} (Pembelian Perbulan)</td>
+                                    <td>{{ $endDate }} </td>
                                 @elseif($start !== 1 && $endPayment !== 1)
-                                <td>{{ $startDate }}</td>
-                                @if ($liveDate == $endDate)
-                                <td>{{ $endDate }} (Dalam Sebulan akan beralih ke <b>Colocation</b>)</td>
-                                @else
-                                <td>{{ $endDate }} (Pembelian Lunas)</td>
-                                @endif
+                                    <td>{{ $startDate }}</td>
+                                        <td>{{ $endDate }} </td>
                                 @else
                                     <td>{{ $startDate }}</td>
-                                    <td>{{$endDate}} (Pembayaran Colocation)</td>
+                                    <td>{{ $endDate }} (Pembayaran Colocation)</td>
                                 @endif
                                 <td>{{ $value['serverLabel'] }}</td>
 
@@ -241,23 +214,10 @@
                                     {{-- <a class="btn btn-primary" href="{{ route('detail_server.create', $item['id']) }}" style="margin:0px 10px;">Tambah</a> --}}
                                     <a href="{{ route('detail_server.edit', $value['id']) }}"
                                         class="btn btn-success form-control">Edit</a>
-                                        <a href="{{ route('detail_server.delete', $value['id']) }}" class="btn btn-danger form-control mt-2" data-confirm-delete="true">Delete</a>
+                                    <a href="{{ route('detail_server.delete', $value['id']) }}"
+                                        class="btn btn-danger form-control mt-2" data-confirm-delete="true">Delete</a>
 
-                                    {{-- method delete tidak bisa digunakan di href harus pakai form --}}
-                                    {{-- <form action="{{ route('detail_server.delete', $value['id']) }}" method="post"
-                                        class="mt-2">
-                                        <input type="number" value="{{$value['id']}}" name="deletePop" hidden>
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger form-control">Hapus</button>
-                                    </form> --}}
                                 </td>
-                                {{-- @foreach ($item->status as $orderStatus) --}}
-                                {{-- <td>
-
-                    
-                            </td> --}}
-                                {{-- @endforeach --}}
 
                             </tr>
                         @endforeach
@@ -279,6 +239,7 @@
                         @php
                             $no = 1;
                             $countUser = count($userData) - 1;
+                            // dd($countUser);
                             $x = count($userData) - 1;
                             // dd($userData);
                         @endphp
@@ -330,10 +291,9 @@
             </div>
         </div>
         <div class="d-flex justify-content-end">
-            @if ($products->count())
-                {{ $products->links() }}
-            @endif
-        </div>
+                {{-- {{ $paginateProducts->links() }} --}}
+                {{ $paginateProducts->withPath(url()->current())->links() }}
+            </div>
     @else
         <div class="card p-5 mt-5 mb-5">
 

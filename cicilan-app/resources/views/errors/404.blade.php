@@ -46,7 +46,7 @@
       
     </div>
     <div class="back">
-        <a style="padding:20px 20px;display:flex;justify-content:center;margin-left:45%;margin-bottom:10%;background-color:blue;box-shadow:-10px 10px gray;border-radius:10px;width: 100px;color:white;text-decoration:none;font-weight:600;" href="/dashboard"href="/dashboard" ><b>Kembali</b></a>
+        <a style="padding:20px 20px;display:flex;justify-content:center;margin-left:45%;margin-bottom:10%;background-color:blue;box-shadow:-10px 10px gray;border-radius:10px;width: 100px;color:white;text-decoration:none;font-weight:600;" href="/dashboard" ><b>Kembali</b></a>
     </div>
     <style>
         .fundo{

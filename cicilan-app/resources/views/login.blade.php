@@ -36,9 +36,16 @@ h2{
 
 .card{
     box-shadow: 0 0 10px rgba(0, 0, 2, 3); 
+    width: 600px;
+    
 }
 
+.flex-content{
+    display: flex;
+    justify-content: center;
+}
 </style>
+<div class="flex-content">
 <form action="{{route ('auth-login')}}" class="card p-4 mt-5" method="POST">
     @csrf
     @if ($errors->any())
@@ -66,5 +73,5 @@ h2{
             Not Registered ? <a href= {{ route('register.index') }}> Created Account</a>
         </div>
     </form>
-
+</div>
     @endsection

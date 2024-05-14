@@ -6,6 +6,8 @@
   table{
       background: whitesmoke;
       border-radius: 5px;
+      max-width: 100%;
+
   }
 
   a{
@@ -45,22 +47,6 @@
 <br>
 
 <div class="mt-1">
-  {{-- <form action="{{ route('user.search') }}" method="GET">
-
-  <div class="form-inline">
-      <div class="input-group w-25" data-widget="sidebar-search">
-          <input class=" form-control" name="searchUser" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-              <button class="btn btn-sidebar" style="background: whitesmoke;">
-                  <i class="fas fa-search fa-fw"></i>
-              <button>
-          </div>
-
-      </div>
-
-      
-    </form>
-     --}}
     <div class="d-flex justify-content-end
     ">
           <a href="{{ route('user.data') }}" class="btn btn-danger" style="margin-left:5%;margin-right:10px;border-radius:5px;">reset</a>
@@ -75,6 +61,7 @@
           @endif --}}
           <h3>Admin Account </h3>
   </div>
+  <div class="table-responsive">
 <table class="table mt-4 table-striped table-bordered table-hovered">
     <thead>
         <tr>
@@ -122,11 +109,8 @@
         </div>
             </td>
             <td class="">
-                <a href="{{route('user.edit', $item['id'])}}" class="btn  w-50 ms-4 mt-2" style="background: darkgreen;color:white;">Edit</a>
-                {{-- <button type="button" class="btn btn-danger w-50 mt-2 ms-4" data-bs-toggle="modal" data-bs-target="#exampleModal" class="ms-4" style="margin: 2px 10px;margin-left:20px;">
-                  Hapus
-                </button> --}}
-                <a href="{{route('user.delete', $item['id'])}}" class="btn btn-danger w-50 mt-2 ms-4" data-confirm-delete="true" style="background: darkred;color:white;">Delete</a>
+                <a href="{{route('user.edit', $item['id'])}}" class="btn btn-success ms-4 mt-2" >Edit</a>
+                <a href="{{route('user.delete', $item['id'])}}" class="btn btn-danger mt-2 ms-4" data-confirm-delete="true" style="background: darkred;color:white;">Delete</a>
 
               </td>
               <!-- Modal -->
@@ -160,11 +144,13 @@
     </tbody>
     
 </table>
+</div>
 <hr>
 <div class="jumbotron  mt-2" style="padding:0px;">
           <h3>Users Account </h3>
   </div>
-<table class="table mt-4 table-striped table-bordered table-hovered">
+  <div class="table-responsive">
+<table class="table mt-4 mb-2 table-striped table-bordered table-hovered">
     <thead>
         <tr>
             <th>No</th>
@@ -211,12 +197,13 @@
         </div>
             </td>
             <td class="">
-                <a href="{{route('user.edit', $item['id'])}}" class="btn  w-50 ms-4 mt-2" style="background: darkgreen;color:white;">Edit</a>
+                <a href="{{route('user.edit', $item['id'])}}" class="btn mt-2 ms-4" style="background: darkgreen;color:white;">Edit</a>
                 {{-- <button type="button" class="btn btn-danger w-50 mt-2 ms-4" data-bs-toggle="modal" data-bs-target="#exampleModal" class="ms-4" style="margin: 2px 10px;margin-left:20px;">
                   Hapus
                 </button> --}}
-                <a href="{{route('user.delete', $item['id'])}}" class="btn  w-50 mt-2 ms-4" data-confirm-delete="true" style="background: darkred;color:white;">Delete</a>
-
+                <div class="responsive" >
+                <a href="{{route('user.delete', $item['id'])}}" class="btn mt-2 ms-4" data-confirm-delete="true" style="background: darkred;color:white;">Delete</a>
+              </div>
               </td>
               <!-- Modal -->
           <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -249,8 +236,8 @@
     </tbody>
     
 </table>
-<div class="d-flex justify-content-end
-">
+</div>
+<div class="d-flex justify-content-end mt-5" >
 @if ($users->count())
 {{$users->links()}}
 @endif

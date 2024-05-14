@@ -28,7 +28,7 @@
                 $isColocation = false;
             }
 
-            @endphp
+        @endphp
 
         @if ($status['access'] == 3)
             @php
@@ -83,8 +83,8 @@
                         </div>
                     </div>
 
-                   
-                        {{-- </div>
+
+                    {{-- </div>
             @if ($orderStatus->access == 3)
             <div class="mb-3" id="bulanSelect" style="width: 100%; margin-left:30px; ">
                 <label style="width:50%;" for="name_product" class="col-sm-2 col-form-label">Pilih Bulan
@@ -99,44 +99,44 @@
             </div>
             @else --}}
 
-                        <div class="mb-3 mt-2" id="months-container" style="width: 100%; margin-left:30px; display: none;">
-                            @if ($isColocation == true)
-                                <label style="width:50%;" for="months" class="col-sm-2 col-form-label">Bulan Layanan
-                                    Colocation:</label>
-                            @elseif($orderStatus->access == 3)
-                                <label style="width:50%;" for="months" class="col-sm-2 col-form-label">Bulan Layanan
-                                    Freeze (MAX/3) :</label>
-                            @else
-                                <label style="width:50%;" for="months" class="col-sm-2 col-form-label">Bulan Layanan
-                                    Colocation:</label>
-                            @endif
-                            <div class="col-sm-10">
-                                <select id="months" class="form-control" name="months">
-                                    {{-- @for ($i = 1; $i <= 12; $i++)
+                    <div class="mb-3 mt-2" id="months-container" style="width: 100%; margin-left:30px; display: none;">
+                        @if ($isColocation == true)
+                            <label style="width:50%;" for="months" class="col-sm-2 col-form-label">Bulan Layanan
+                                Colocation:</label>
+                        @elseif($orderStatus->access == 3)
+                            <label style="width:50%;" for="months" class="col-sm-2 col-form-label">Bulan Layanan
+                                Freeze (MAX/3) :</label>
+                        @else
+                            <label style="width:50%;" for="months" class="col-sm-2 col-form-label">Bulan Layanan
+                                Colocation:</label>
+                        @endif
+                        <div class="col-sm-10">
+                            <select id="months" class="form-control" name="months">
+                                {{-- @for ($i = 1; $i <= 12; $i++)
                                     @if ($i == 1 || $i == 3 || $i == 6 || $i == 12)
                                         <option value="{{ $i }}">{{ $i }} Bulan - Tulisan Admin</option>
                                     @endif
                                 @endfor --}}
-                                </select>
-                            </div>
-                            <div class="mt-2" style="width: 100%;">
-                                <label style="width:50%;" for="name_product" class="col-sm-2 col-form-label">Input
-                                    @if ($secondProduct)
-                                        <span> Price ke-2: {{ $secondProduct['name_product'] }}</span>
-                                    @else
-                                        <span> Price :</span>
-                                    @endif
-                                </label>
-                                <div class="col-sm-10">
-                                    <input type="number" name="freezePrice" class="form-control form-input"
-                                        placeholder="Freeze Price" required>
-                                </div>
+                            </select>
+                        </div>
+                        <div class="mt-2" style="width: 100%;">
+                            <label style="width:50%;" for="name_product" class="col-sm-2 col-form-label">Input
+                                @if ($secondProduct)
+                                    <span> Price ke-2: {{ $secondProduct['name_product'] }}</span>
+                                @else
+                                    <span> Price :</span>
+                                @endif
+                            </label>
+                            <div class="col-sm-10">
+                                <input type="number" name="freezePrice" class="form-control form-input"
+                                    placeholder="Freeze Price" required>
                             </div>
                         </div>
+                    </div>
 
 
-                        <hr>
-                        {{-- @endif --}}
+                    <hr>
+                    {{-- @endif --}}
                 @endforeach
             @endif
         @elseif (

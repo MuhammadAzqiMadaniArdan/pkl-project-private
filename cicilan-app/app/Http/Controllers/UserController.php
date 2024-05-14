@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
-
+use Symfony\Contracts\Service\Attribute\Required;
 
 class UserController extends Controller
 {
@@ -94,29 +94,7 @@ class UserController extends Controller
         }
     }
 
-    public function authLoginAdmin(Request $request)
-    {
-        $request->validate([
-            // email dns digunakan untuk mengecek user apakah memeiliki alamt google,yahoo dll yang bersifat dns
-            'email' => 'required|email',
-            'password' => 'required',
-
-        ]);
-        // simpan data dari dalam email dan password ke dalam variabel untuk memudahkan panggilan 
-        $user = $request->only(['email', 'password']);
-
-        $userRole = User::where('email', $request->email)->first();
-
-
-        // mengecek kecocokkan email dan password kemudian menyimopannya d dalam class beranama auth(memberi didentitas data riwayat login ke project)
-        if ($userRole['role'] == "admin" && Auth::attempt($user)) {
-            return redirect('/dashboard')->with('success', 'login Admin berhasil!');
-            // perbedaan redirect dan route 
-        } else {
-            return redirect()->back()->with('error', 'Login gagal! Anda Bukan Admin');
-        }
-    }
-
+   
     public function authRegister(Request $request)
     {
         $request->validate([
@@ -197,10 +175,6 @@ class UserController extends Controller
         // Proses untuk menyimpan data penerima ke dalam array $dataRecipients
         $dataAddress = [];
 
-        // Cari penerima di antara guru-guru yang ada
-        // $guru = $guruaddress->where('id', $recipientId)->first();
-
-        // Jika guru ditemukan, tambahkan ke dalam array $dataAddress
         $dataAddress[] = [
             'address' => $request->address,
             'city' => $request->city,
@@ -228,7 +202,7 @@ class UserController extends Controller
             ]);
 
             // abis simpen, arahin ke halaman mana
-            return redirect()->route('user.data')->with('success', 'berhasil membuat Akun!');
+            return redirect()->back()->with('success', 'berhasil membuat Akun!');
         } else {
             return redirect()->back()->with('error', 'Password dan confirm Password Harus Sama');
         }
@@ -254,9 +228,7 @@ class UserController extends Controller
             'city' => 'required',
             'state' => 'required',
             'country' => 'required',
-            'password' => 'required',
             'role' => 'required',
-            'confirm_password' => 'required',
         ]);
 
         // arrRecipient
@@ -341,16 +313,6 @@ class UserController extends Controller
         return view('user.edit', compact('user'));
     }
 
-    public function editAkun($id)
-    {
-        //
-        // mengambil data yang belum dimunculkan
-        // find: mencari berdasarkan column
-        // bisa jkuga : where ('id',$id)->first()
-        $user = User::find($id);
-
-        return view('order.user.user', compact('user'));
-    }
 
     /**
      * Update the specified resource in storage.
@@ -371,7 +333,13 @@ class UserController extends Controller
             'country' => 'required',
         ]);
 
-        $pw = password_hash($request->password, PASSWORD_DEFAULT);
+        if($request->password == null){
+            $userData = User::where('id',$id)->first();
+            $pw = $userData['password'];
+        }else{
+
+            $pw = password_hash($request->password, PASSWORD_DEFAULT);
+        }
 
         // cari berdasarkan id terus update
         $dataAddress = [];
@@ -390,6 +358,7 @@ class UserController extends Controller
 
         $request['address'] = $dataAddress;
 
+        
         User::where('id', $id)->update([
             'name' => $request->name,
             'email' => $request->email,
@@ -405,54 +374,7 @@ class UserController extends Controller
         return redirect()->route('user.data')->with('success', 'Berhasil mengubah data user!');
     }
 
-    public function updateAkun(Request $request, $id)
-    {
-        //
-        // validasi
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'role' => 'required',
-            'notelp' => 'required',
-            'company' => 'nullable',
-            'address' => 'required',
-            'city' => 'required',
-            'state' => 'required',
-            'country' => 'required',
-            'password' => '',
-        ]);
-        $pw = password_hash($request->password, PASSWORD_DEFAULT);
-
-        // cari berdasarkan id terus update
-        $dataAddress = [];
-
-        // Cari penerima di antara guru-guru yang ada
-        // $guru = $guruaddress->where('id', $recipientId)->first();
-
-        // Jika guru ditemukan, tambahkan ke dalam array $dataAddress
-        $dataAddress[] = [
-            'address' => $request->address,
-            'city' => $request->city,
-            'state' => $request->state,
-            'country' => $request->country,
-        ];
-
-
-        $request['address'] = $dataAddress;
-
-        User::where('id', $id)->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-            'notelp' => $request->notelp,
-            'address' => $request->address,
-            'company' => $request->filled('company') ? $request->company : null, // Menyimpan data perusahaan jika diisi, jika tidak, maka null
-        ]);
-        // redirect ke html user data
-        // route digunakan untuk memindahkan suatu ke page yang lain jika ingin menambahkan notif ke tempat lain bisa di ganti ke product.tambah atau product.edit
-        // return redirect()->back()->with('success', 'Berhasil mengubah data produk!');
-        return redirect()->back()->with('success', 'Berhasil mengubah data user!');
-    }
+   
 
     /**
      * Remove the specified resource from storage.
@@ -460,7 +382,20 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+        
+        $orderStatus = Order::where('user_id',$id)->get();
+        $countOrder = count($orderStatus);
+        if($countOrder == 1){
+            Order::where('user_id',$id);
+        }else{
+            foreach($orderStatus as $status){
+                Order_status::where('order_id',$status['id'])->delete();
+                Order::where('id',$status['id'])->delete();
+            }
+        }
+
         User::where('id', $id)->delete();
+
         return redirect()->back()->with('success', 'Berhasil menghapus data!');
     }
 

@@ -19,19 +19,13 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule)
     {
-    // 
-        // Menjadwalkan perintah untuk berjalan setiap hari pada jam 3
-        $schedule->command('app:send-lunas-email')->dailyAt('03:00');
-            // $schedule->command('app:send-lunas-email')->hourly('03:00');
-        // $schedule->command('app:send-lunas-email')
-        //  ->cron('03.00.00')
-        //  ->when(function () {
-        //      $currentMinute = now()->minute;
-        //      return $currentMinute = 59 || $currentMinute >= 0 && $currentMinute <= 3;
-        //  });
-
+        // Perintah schedue untuk menjaankan cmmand pada waktu perhari hjanya di jam 3
+        info("test");
+        $schedule->command('app:send-lunas-email')->dailyAt('00:00');
          
-        
+        $schedule->call(function () {
+            file_put_contents(storage_path('logs/cronjob.log'), 'Cronjob is running at ' . now() . PHP_EOL, FILE_APPEND);
+        })->everyMinute();
     }
 
 

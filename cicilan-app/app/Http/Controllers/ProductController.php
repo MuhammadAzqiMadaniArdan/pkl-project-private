@@ -8,6 +8,11 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
+// Paginator
+
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductController extends Controller
 {
@@ -17,7 +22,7 @@ class ProductController extends Controller
     public function index()
     {
         //proses ambil data
-        $products = Product::orderBy('name', 'ASC')->simplePaginate(5);
+        $products = Product::orderBy('type', 'ASC')->simplePaginate(5);
         // mannggil html yang ada di folder resources/views/product.index.blade.php
         //compact : mengirim data ke blade 
 
@@ -124,7 +129,7 @@ class ProductController extends Controller
 
     public function stockData()
     {
-        $products = Product::orderBy('stock', 'ASC')->simplePaginate(5);
+        $products = Product::orderBy('type', 'ASC')->simplePaginate(5);
         return view('product.stock', compact('products'));
     }
 
@@ -146,10 +151,118 @@ class ProductController extends Controller
         return response()->json('berhasil', 200);
     }
 
-    public function dedicatedNew()
+    public function dedicatedIndex()
+    {
+        $dedicMurah = [];
+        $dedicated1 = Product::where('type', 'dedicated')->simplePaginate(100);
+        $dedic1 = [];
+        $sewaGet = [];
+    
+        $dedicatedDer = Order::simplePaginate(100);
+        foreach ($dedicatedDer as $key) {
+            $sewaStatus = $key['user_id'];
+            array_push($sewaGet, $sewaStatus);
+            $get1 = Order_status::where('order_id', $key['id'])->first();
+            foreach ($key['products'] as $product) {
+                if ($product['type'] == 'dedicated' && $get1['payment'] > 0) {
+                    $dedic2 = $key;
+                    array_push($dedic1, $dedic2);
+                } elseif ($product['type'] == 'colocation') {
+                    $dedic3 = $key;
+                    array_push($dedicMurah, $dedic3);
+                }
+            }
+        }
+    
+        // Memastikan $dedicValidate tetap memiliki nilai yang valid
+        $dedicValidate = data_get($dedic1, '0', false);
+
+        if($dedicValidate == false){
+            $dedic1 = $this->paginate($dedic1);            
+        }else{
+            $dedic1 = $this->paginate($dedic1);       
+        }
+        // Paginasi $dedic1 dengan 2 item per halaman
+    
+        return view('order.client.dedicated', compact('dedicatedDer', 'dedicMurah', 'dedic1', 'dedicated1','dedicValidate'))->with('success', 'Dedicated Theme!');
+    }
+    
+    /**
+     * Paginate an array of items.
+     *
+     * @return LengthAwarePaginator         
+     * The paginated items.
+     */
+    private function paginate($items, $perPage = 10, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
+    public function dedicatedSearch(Request $request){
+
+        $search = $request->input('search');
+
+
+        
+        $dedicMurah = [];
+        $dedicated1 = Product::where('type', 'dedicated')->simplePaginate(100);
+        $dedic1 = [];
+        $sewaGet = [];
+
+        $dedicatedDer = Order::simplePaginate(100);
+        foreach ($dedicatedDer as $key) {
+            $sewaStatus = $key['user_id'];
+            array_push($sewaGet, $sewaStatus);
+            // dd($dedicatedDer[0]['products'],$product);
+            $get1 = Order_status::where('order_id', $key['id'])->first();
+            // dd($key['id'],$get1['payment'] );
+            // dd($dedicatedDer[1]['products']);
+            foreach ($key['products'] as $product) {
+                # code...
+                if ($product['type'] == 'dedicated' && $get1['payment'] > 0) {
+                    $dedic2 = $key;
+                    array_push($dedic1, $dedic2);
+                } elseif ($product['type'] == 'colocation') {
+                    # code...
+                    $dedic3 = $key;
+                    array_push($dedicMurah, $dedic3);
+                }
+            }
+        }
+
+        $orders = Order::whereDate('created_at', 'like', "%$search%")->simplePaginate(5);
+        
+        if($dedic1 == null){
+            $dedic1 = [];
+        }else{
+            $dedicatedPush = [];
+            foreach($orders as $dedicated){
+                if($dedicated['products'][0]['type'] == "dedicated"){
+                    array_push($dedicatedPush,$dedicated);
+                }
+            }
+            $dedic1 = $dedicatedPush;
+        }
+
+        $dedicValidate = data_get($dedic1, '0', false);
+
+        if($dedicValidate == false){
+            $dedic1 = $this->paginate($dedic1);            
+        }else{
+            $dedic1 = $this->paginate($dedic1);       
+        }
+
+        return view('order.client.dedicated', compact('dedicatedDer', 'dedicMurah', 'dedic1', 'dedicated1','dedicValidate'))->with('success', 'login berhasil!');
+   
+
+    }
+
+    public function colocationIndex()
     {
 
-        $dedicMurah = [];
+        $colocation = [];
         $dedicated1 = Product::where('type', 'dedicated')->simplePaginate(100);
         $dedic1 = [];
         $sewaGet = [];
@@ -167,18 +280,23 @@ class ProductController extends Controller
                 if ($product['type'] == 'dedicated' && $get1['payment'] > 0) {
                     $dedic2 = $key;
                     array_push($dedic1, $dedic2);
-                } elseif ($product['type'] == 'colocation') {
+                } elseif ($product['type'] == 'colocation' && $get1['payment'] > 0) {
                     # code...
-                    $dedic3 = $key;
-                    array_push($dedicMurah, $dedic3);
+                    $dedicMurah = $key;
+                    array_push($colocation, $dedicMurah);
                 }
             }
         }
+        $coloValidate = data_get($colocation, '0', false);
 
-        // dd($dedicated1,$dedic1,$dedicMurah);
-        return view('order.client.dedicated', compact('dedicatedDer', 'dedicMurah', 'dedic1', 'dedicated1'))->with('success', 'login berhasil!');
+
+
+        // dd($dedicated1,$dedic1,$colocation);
+        return view('order.client.colocation', compact('dedicatedDer', 'colocation', 'dedic1', 'dedicated1','coloValidate'))->with('success', 'login berhasil!');
     }
-    public function colocationNew()
+    // cart Sessions
+    
+    public function colocationSearch(Request $request)
     {
 
         $colocation = [];
@@ -207,289 +325,33 @@ class ProductController extends Controller
             }
         }
 
+        $search = $request->input('search');
+
+
+        $orders = Order::whereDate('created_at', 'like', "%$search%")->simplePaginate(5);
+        
+        if($colocation == null){
+            $colocation = [];
+        }else{
+            $colocationPush = [];
+            foreach($orders as $colocated){
+                if($colocated['products'][0]['type'] == "colocation"){
+                    array_push($colocationPush,$colocated);
+                }
+            }
+            $colocation = $colocationPush;
+        }
+
+        $coloValidate = data_get($colocation, '0', false);
+
+
 
         // dd($dedicated1,$dedic1,$colocation);
-        return view('order.client.colocation', compact('dedicatedDer', 'colocation', 'dedic1', 'dedicated1'))->with('success', 'login berhasil!');
-    }
-    // cart Sessions
-
-    // this function is to show cart of product because we wanna show result of choose product by user in this page
-    public function cart()
-    {
-        return view('order.user.cart');
-
-        // $products = Product::orderBy('type', 'ASC')->paginate(100);
-        // $bulan = Order::all();
-        // return view('order.user.create', compact('products', 'bulan'));
-    }
-
-
-
-    public function addToCart(Request $request, $id) // by this function we add product of choose in card
-    {
-        $product = Product::find($id);
-        $totalPrice = 0;
-
-
-
-        if (!$product) {
-
-            abort(404);
-        }
-        // what is Session:
-        //Sessions are used to store information about the user across the requests.
-        // Laravel provides various drivers like file, cookie, apc, array, Memcached, Redis, and database to handle session data. 
-        // so cause write the below code in controller and tis code is fix
-        $cart = session()->get('cart');
-
-        $products = array_count_values($request->products);
-
-        // foreach ($products as $key => $value) {
-        //     $product = Product::where('id', $key)->first();
-
-        //     if ($product['type'] == 'colocation') {
-        //         if ($request->bulan == 12) {
-        //             $priceEnd = 1 * (int)$product['price'];
-        //         } else {
-        //         }
-        //     } else {
-        //     }
-        // }
-
-        if (!$cart) {
-            if ($product['type'] == 'colocation') {
-                if ($request->bulan == 12) {
-                    $cart = [
-                        $id => [
-                            "name" => $product->name,
-                            "type" => $product->type,
-                            "quantity" => 1,
-                            "price" => $product->price,
-                            "price_after_qty" => 1 * (int)$product->price - 360000,
-                            "photo" => $product->photo,
-                            "port" => [
-                                "name" => $request->port,
-                            ],
-                            "IP" => [
-                                "name" => $request->IP,
-                                "price_after_qty" => $request->SATA * 900000,
-                            ],
-                            "bandwidth" => [
-                                "qty" => $request->bandwidth,
-                                "price_after_qty" => (int)$request->bandwidth * 30000 * $request->bulan,
-                            ],
-                            "label" => $request->label_product,
-                            "bulan" => $request->bulan
-                        ]
-                    ];
-                } else {
-                    $cart = [
-                        $id => [
-                            "name" => $product->name,
-                            "type" => $product->type,
-                            "quantity" => 1,
-                            "price" => $product->price,
-                            "price_after_qty" => 1 * (int)$product->price - 360000,
-                            "photo" => $product->photo,
-                            "port" => [
-                                "name" => $request->port,
-                            ],
-                            "IP" => [
-                                "name" => $request->IP,
-                                "price_after_qty" => $request->SATA * 900000,
-                            ],
-                            "bandwidth" => [
-                                "qty" => $request->bandwidth,
-                                "price_after_qty" => (int)$request->bandwidth * 30000 * $request->bulan,
-                            ],
-                            "label" => $request->label_product,
-                            "bulan" => $request->bulan
-                        ]
-                    ];
-                }
-            } else {
-                $cart = [
-                    $id => [
-                        "name" => $product->name,
-                        "type" => $product->type,
-                        "quantity" => 1,
-                        "price" => $product->price,
-                        "price_after_qty" => 1 * (int)$product->price,
-                        "photo" => $product->photo,
-                        "ram" => [
-                            "name" => $request->ram,
-                        ],
-                        "SATA" => [
-                            "qty" => $request->SATA,
-                            "price_after_qty" => $request->SATA * 900000,
-                        ],
-                        "NVME" => [
-                            "qty" => $request->NVME,
-                            "price_after_qty" => $request->NVME * 1000000,
-                        ],
-                        "port" => [
-                            "name" => $request->port,
-                        ],
-                        "IP" => [
-                            "name" => $request->IP,
-                            "price_after_qty" => $request->SATA * 900000,
-                        ],
-                        "bandwidth" => [
-                            "qty" => $request->bandwidth,
-                            "price_after_qty" => (int)$request->bandwidth * 30000 * $request->bulan,
-                        ],
-                        "datacenter" => $request->datacenter,
-                        "OS" => $request->oS,
-                        "bulan" => $request->bulan
-
-                    ]
-                ];
-            }
-
-
-            session()->put('cart', $cart);
-
-            return redirect()->route('order.cart')->with('success', 'added to cart successfully!');
-            //  return redirect()->back()->with('success', 'added to cart successfully!');
-        }
-
-        // if cart not empty then check if this product exist then increment quantity
-        if (isset($cart[$id])) {
-
-            $cart[$id]['quantity']++;
-
-            session()->put('cart', $cart); // this code put product of choose in cart
-
-            return redirect()->route('order.cart')->with('success', 'Product added to cart successfully!');
-            //  return redirect()->back()->with('success', 'Product added to cart successfully!');
-
-        }
-        // if cart is empty then this the first product
-
-
-        // if item not exist in cart then add to cart with quantity = 1
-        if ($product['type'] == 'colocation') {
-            if ($request->bulan == 12) {
-                $cart[$id] = [
-                    "name" => $product->name,
-                    "type" => $product->type,
-                    "quantity" => 1,
-                    "price" => $product->price,
-                    "price_after_qty" => (int)$request->bulan * (int)$product->price - 360000,
-                    "photo" => $product->photo,
-                    "port" => [
-                        "name" => $request->port,
-                    ],
-                    "IP" => [
-                        "name" => $request->IP,
-                        "price_after_qty" => $request->SATA * 900000,
-                    ],
-                    "bandwidth" => [
-                        "qty" => $request->bandwidth,
-                        "price_after_qty" => (int)$request->bandwidth * 30000 * $request->bulan,
-                    ],
-                    "label" => $request->label_product,
-                    "bulan" => $request->bulan
-
-                ];
-            } else {
-                $cart[$id] = [
-                    "name" => $product->name,
-                    "type" => $product->type,
-                    "quantity" => 1,
-                    "price" => $product->price,
-                    "price_after_qty" => (int)$request->bulan * (int)$product->price,
-                    "port" => [
-                        "name" => $request->port,
-                    ],
-                    "IP" => [
-                        "name" => $request->IP,
-                        "price_after_qty" => $request->SATA * 900000,
-                    ],
-                    "bandwidth" => [
-                        "qty" => $request->bandwidth,
-                        "price_after_qty" => (int)$request->bandwidth * 30000 * $request->bulan,
-                    ],
-                    "label" => $request->label_product,
-                    "bulan" => $request->bulan
-
-                ];
-            }
-            $totalPrice += $cart[$id]['price_after_qty'];
-        } else {
-            $cart[$id] = [
-                "name" => $product->name,
-                "type" => $product->type,
-                "quantity" => 1,
-                "price" => $product->price,
-                "price_after_qty" => 1 * (int)$product->price,
-                "photo" => $product->photo,
-                "ram" => [
-                    "name" => $request->ram,
-                ],
-                "SATA" => [
-                    "qty" => $request->SATA,
-                    "price_after_qty" => $request->SATA * 900000,
-                ],
-                "NVME" => [
-                    "qty" => $request->NVME,
-                    "price_after_qty" => $request->NVME * 1000000,
-                ],
-                "port" => [
-                    "name" => $request->port,
-                ],
-                "IP" => [
-                    "name" => $request->IP,
-                    "price_after_qty" => $request->SATA * 900000,
-                ],
-                "bandwidth" => [
-                    "qty" => $request->bandwidth,
-                    "price_after_qty" => (int)$request->bandwidth * 30000 * $request->bulan,
-                ],
-                "datacenter" => $request->datacenter,
-                "OS" => $request->oS,
-                "bulan" => $request->bulan,
-
-            ];
-            $totalPrice += $cart[$id]['price_after_qty'];
-        }
-
-
-        session()->put('cart', $cart); // this code put product of choose in cart
-
-        return redirect()->route('order.cart')->with('success', 'Product added to cart successfully!');
-    }
-    // update product of choose in cart
-    public function updateCart(Request $request)
-    {
-        if ($request->id and $request->quantity) {
-            $cart = session()->get('cart');
-
-            $cart[$request->id]["quantity"] = $request->quantity;
-
-            session()->put('cart', $cart);
-
-            session()->flash('success', 'Cart updated successfully');
-        }
+        return view('order.client.colocation', compact('dedicatedDer', 'colocation', 'dedic1', 'dedicated1','coloValidate'))->with('success', 'login berhasil!');
     }
 
     // delete or remove product of choose in cart
-    public function removeCart(Request $request)
-    {
-        if ($request->id) {
-
-            $cart = session()->get('cart');
-
-            if (isset($cart[$request->id])) {
-
-                unset($cart[$request->id]);
-
-                session()->put('cart', $cart);
-            }
-
-            session()->flash('success', 'Product removed successfully');
-        }
-    }
+   
 
     public function search(Request $request)
     {
@@ -511,5 +373,48 @@ class ProductController extends Controller
 
 
         return view('product.stock', compact('products'));
+    }
+
+    public function sewaDate(Request $request)
+    {
+        $get1 = Order_status::where('payment', '<', 1)->simplePaginate(100);
+        $sewaEnd = [];
+        foreach ($get1 as $sewa) {
+            # code...
+            $sewaAdd = $sewa['order_id'];
+            array_push($sewaEnd, $sewaAdd);
+        }
+
+        $sewaProducts = [];
+        for ($i = 0; $i < count($sewaEnd); $i++) {
+            # code...
+            $sewaGet = Order::where('id', $sewaEnd[$i])->first();
+            array_push($sewaProducts, $sewaGet);
+        }
+
+        $search = $request->input("search");
+        // dd($get1,$sewaEnd,$sewaProducts);
+        
+
+        $orders = Order::whereDate('created_at', 'like', "%$search%")->simplePaginate(5);
+
+        if($sewaProducts == null){
+            $sewaProducts = [];
+        }else{
+            $sewaHas = [];
+            foreach($orders as $sewa){
+                // dd($orders);
+                $orderStatus = Order_status::where('order_id',$sewa['id'])->first();
+                if($orderStatus['payment'] < 1){
+                    array_push($sewaHas,$sewa);
+                }
+            }
+            $sewaProducts = $sewaHas;
+        }
+
+        $sewaValidate = data_get($sewaProducts, '0', true);
+
+        // $user = User::OrderBy('id', 'ASC')->simplePaginate(100);
+        return view('order.client.sewa', compact('get1', 'sewaProducts'));
     }
 }

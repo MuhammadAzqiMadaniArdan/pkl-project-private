@@ -44,21 +44,13 @@
          }
  
      @endphp
-        {{-- @dd($EntryAll) --}}
-     
-    {{-- @dd($productEntry['entryData'],$data1,$validate,$dataBulan) --}}
-    {{-- <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"> --}}
     <div class="jumbotron  mt-2" style="padding:0px;">
         <div class="container">
-            {{-- @if (Session::get('failed'))
-            <div class="alert alert-danger">{{Session::get('failed')}}</div>
-            @endif --}}
             <h3><b>Penambahan Order</b> </h3>
-            <p class="lead"><a href="/dashboard">Home</a>/<a href="{{ route('order.index') }}">DataOrder</a>/<a
+            <p class="lead"><a href="/dashboard">Home</a>/<a href="{{ route('admin.order.entryData',$userData->id) }}">DataPemesanan</a>/<a
                     href="#">TambahOrderColocation</a></p>
         </div>
     </div>
-    {{-- <form id="cart" action="{{ route('order.addToCart',$userData->id) }}" class="card p-4 mt-5" method="GET"> --}}
         @if($validate == true)
 
             <form action="{{ route('admin.order.adminStore') }}" class="card p-4 mt-5" method="POST">
@@ -90,30 +82,9 @@
                     value="{{$userData->company }}" disabled>
             @endif
         </div>
-        {{-- <div class="mb-3 d-flex align-items-center" hidden>
-            <label for="name_customer" class="form-label" style="width: 12%">Nama Pembeli</label>
-            <input type="text" name="name_customer" id="name_customer" class="form-control" style="width:88%">
-        </div>
-        <div class="mb-3 d-flex align-items-center" hidden>
-            <label for="no_telp" class="form-label" style="width: 12%">NoTelp:</label>
-            <input type="text" name="no_telp" id="no_telp" class="form-control" style="width:88%">
-        </div>
-        <div class="mb-3 d-flex align-items-center" hidden>
-            <label for="company" class="form-label" style="width: 12%">Perusahaan:</label>
-            <input type="text" name="company" id="company" class="form-control" style="width:88%">
-        </div> --}}
         @php
             $address = $userData;
         @endphp
-        {{-- @foreach ($address['address'] as $address2)
-        <li style="list-style-type:circle;">
-
-                                {{ $address2['address'] }} <small>
-                                    {{$address2['city']}} City
-                                    <b>(State : {{ $address2['state'] }})</b>
-                                </small>
-                            </li>
-        @endforeach --}}
         <div class="mb-3 d-flex align-items-center">
             @foreach ($address['address'] as $address2)
                 <label for="address" class="form-label" style="width: 12%">Alamat Anda:</label>
@@ -149,32 +120,6 @@
         </div>
        
 
-        {{-- <div class="mb-3"> --}}
-        {{-- <div class="d-flex align-items-center">
-                <label for="products" class="form-label" style="width: 12%">Produk : </label> --}}
-        {{-- name dengan [] biasanya dipake buat column yang tipe datanya json/array,dan biasaanya digunakan apabila input dengan tujuan data yang sama ada banyak (dan dari input yang baanyak datanya tersebut , datanya akan diambil seluruhnya dalam bentuk array ) --}}
-        {{-- <select type="text" name="products[]" id="products" class="form-control form-select"
-                    style="width:88%">
-                    <option selected hidden disabled>
-                        Pesanan 1
-                    </option>
-                    @foreach ($products as $product)
-                       
-                        @if ($product['type'] == 'cloud' || $product['type'] == 'dedicated' || $product['type'] == 'colocation')
-                            <option value="{{ $product['id'] }}">{{ $product['name'] }}</option>
-                        @endif
-                    @endforeach
-                </select>
-            </div> --}}
-        {{-- karena akan ada js yg menampilkan select ketika di klik maka disediakan btempat elemen yang akan dihasilkan dari js tersebut --}}
-        {{-- </div> --}}
-        {{-- @foreach($products as $product)
-        @php
-
-            dd($products[11])
-    
-        @endphp
-        @endforeach --}}
         <div class="mb-3">
             @foreach ($address['address'] as $address2)
                 <div class="d-flex align-items-center">

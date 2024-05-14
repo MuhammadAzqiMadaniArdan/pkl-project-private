@@ -28,23 +28,23 @@
     <div class="jumbotron mt-2" style="padding:0px;">
         <div class="container">
             <h3><b>Datacenter Asnet</b></h3>
-            <p class="lead"><a href="/dashboard">Home</a>/<a href="{{ route('admin.order.data') }}">Data Order</a>/<a
-                    href="#">Datacenter Asnet </a></p>
+            <p class="lead"><a href="/dashboard">Home</a>/<a href="#">Datacenter Asnet </a></p>
         </div>
     </div>
     {{-- <p>hai</p> --}}
 
-
     <div class="container mt-5" hidden>
-        <select class="livesearch form-control" name="livesearch" style="color:black;" ></select>
+        <select class="livesearch form-control" name="livesearch" style="color:black;"></select>
 
     </div>
     <br>
-    <div class=" justify-content-start" style="width: 30%;height:10%;">
-        <form action="{{ route('internal.search') }}" class="" method="GET"
-            style="display: flex;justify-content:space-between;">
-            <label for="search" class="form-label w-25" style="width:30%">Search :</label>
-            <select type="number" name="search" id="search" class="w-50" style="width:100%;margin-left:5%;">
+    <div class=" justify-content-start" style="max-width: 70%;height:10%;">
+        <form action="{{ route('internal.search') }}" class="d-flex" method="GET" >
+
+            
+
+            <label for="search" class="form-label w-25" style="">Search :</label>
+            <select type="number" name="search" id="search" class="form-select w-100" style="max-width:100%;margin-left:1%;">
                 @php
                     $uniqueRack = [];
                 @endphp
@@ -61,10 +61,9 @@
                     @php $uniqueRack[] = $rack; @endphp
                 @endforeach
             </select>
-
-            {{-- <input type="number" name="search" id="search" class="w-50" style="width:100%;margin-left:5%;"> --}}
-            <button type="submit" name="searchRack" class="btn btn-primary mr-5 w-25" style="margin-left:5%;">cari</button>
-            <a href="{{ route('internal.Bogor') }}" class="btn btn-danger w-25 " style="margin-left:5%;">reset</a>
+            <button type="submit" name="searchRack" class="btn btn-primary mr-5 " style="margin-left:5%;">cari</button>
+            
+            <a href="{{ route('internal.Bogor') }}" class="btn btn-danger " style="margin-left:2%;text-align:center;">reset</a>
         </form>
     </div>
 
@@ -72,14 +71,14 @@
         $orderProducts = [];
         $serverProducts = [];
         foreach ($orders as $order) {
-            $serverData = data_get($order['products'], '4', 1);
+            $serverData = last($order['products']);
+            $countProducts = count($order['products']) - 2;
             // dd($serverData);
-            if ($serverData !== 1) {
+            if ($serverData['type'] == 'freeze') {
+                $freezeProducts = $order['products'][$countProducts];
+                array_push($serverProducts, $freezeProducts);
+            } else {
                 array_push($serverProducts, $serverData);
-                // $orderData = data_get($order,$serverData);
-                // array_push($orderProducts, $orderData);
-                // $serverKe4 = $serverData;
-                // array_push ($orderProducts , $serverData);
             }
             // array_push($orderProducts,[$order['id']]);
         }
@@ -124,7 +123,7 @@
                                 {{-- <th>serialNumber</th>
                             <th>Additional</th> --}}
                                 <th>Start Server</th>
-                                <th>Expired Date</th>
+                                <th>End Date</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -210,7 +209,7 @@
                                                     @foreach ($valueInner['products'] as $product)
                                                         @if ($product['type'] == 'dell' || $product['type'] == 'HP' || $product['type'] == 'supermicro')
                                                             <li>
-                                                                o Nama :{{ $product['series'] }} <br>
+                                                                o Series :{{ $product['series'] }} <br>
                                                                 o Type : {{ $product['type'] }} <br>
                                                                 o Serial Number : {{ $product['serialNumber'] }} <br>
                                                                 o Label : {{ $product['serverLabel'] }}
@@ -240,16 +239,16 @@
                                                         {{-- <td>{{ $value['entryDate'] }}</td> --}}
                                                         @php
                                                             // dd($product);
-                                                            $startGet = data_get($product, 'startDate', 2);
+                                                            $startGet = data_get($product, 'startaDate', 2);
                                                             $entryGet = data_get($product, 'entryDate', 2);
                                                             if ($startGet == 2) {
                                                                 $startData = Carbon\Carbon::parse(
                                                                     $entryGet,
-                                                                )->formatLocalized('%d %B %Y %H:%M');
+                                                                )->formatLocalized('%d %B %Y ');
                                                             } else {
                                                                 $startData = Carbon\Carbon::parse(
                                                                     $startGet,
-                                                                )->formatLocalized('%d %B %Y %H:%M');
+                                                                )->formatLocalized('%d %B %Y ');
                                                             }
                                                         @endphp
                                                         {{-- @for ($i = 0; $i < count($arr_Data); $i++) --}}
@@ -322,12 +321,13 @@
                                                             class="btn btn-success form-control">Edit
                                                             {{ $product['serverLabel'] }}</a>
                                                         <br>
-
-                                                        <a href="{{ route('detail_server.delete', $valueInner['id']) }}"
-                                                            class="btn btn-danger form-control mt-2"
-                                                            data-confirm-delete="true">Delete
-                                                            {{ $product['serverLabel'] }}</a>
-                                                        <hr>
+                                                        <div class="responsive">
+                                                            <a href="{{ route('detail_server.delete', $valueInner['id']) }}"
+                                                                class="btn btn-danger form-control mt-2"
+                                                                data-confirm-delete="true">Delete
+                                                                {{ $product['serverLabel'] }}</a>
+                                                            <hr>
+                                                        </div>
                                                     @endif
                                                 @endforeach
                                             @else
@@ -360,7 +360,7 @@
                     </table>
                 </div>
             </div>
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end mt-3">
                 @if ($products->count())
                     {{ $products->links() }}
                 @endif

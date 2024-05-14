@@ -31,15 +31,22 @@
 <div class="mt-2">
     <form action="{{ route('product.searchStock') }}" method="GET">
   
-    <div class="form-inline">
-        <div class="input-group w-25" data-widget="sidebar-search">
-            <input class=" form-control" name="search" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-append">
-                <button class="btn btn-sidebar" style="background: whitesmoke;">
-                    <i class="fas fa-search fa-fw"></i>
-                </button>
+        <div class="form-inline">
+        
+            <div class="input-group searchPage " data-widget="sidebar-search">
+            <div class="input-group w-50" data-widget="sidebar-search">
+                {{-- <div class="search"> --}}
+                <input class=" form-control" name="search" type="text" placeholder="Search" aria-label="Search">
+                {{-- <div class="input-group-append"> --}}
+                    <button class="btn btn-sidebar" style="background: whitesmoke;">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                {{-- </div> --}}
+            </div>
+                <a href="{{ route('product.data.stock') }}" class="btn btn-danger ms-2" style="border-radius:5px;">reset</a>
             </div>
         </div>
+        
       </form>
     </div>
   
@@ -47,7 +54,7 @@
 <table class="table table-striped table-bordered table-hovered">
     <thead>
         <tr>
-            <th>#</th>
+            <th>No</th>
             <th>Nama</th>
             <th>Stock</th>
             <th>Aksi</th>
@@ -69,7 +76,7 @@
 </table>
 
 <div class="d-flex justify-content-end
-">
+ mt-3">
 @if ($products->count())
 {{$products->links()}}
 @endif
