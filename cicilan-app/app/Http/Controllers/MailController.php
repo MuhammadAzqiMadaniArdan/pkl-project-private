@@ -13,7 +13,7 @@ class MailController extends Controller
     //
     public function index(){
         $mailData = [
-            'title' => 'Mail from Happy',
+            'title' => 'Mail from Admin',
             'body' => 'this is for testing email using smtp',
         ];
 

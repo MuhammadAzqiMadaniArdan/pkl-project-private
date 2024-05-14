@@ -427,11 +427,11 @@
                 </select>
             </div>
         </div>
-        <h3> Account Security</h3>
-        <div class="row ">
-            <div class="col-sm-6 w-50 ">
+        <div class="row" id="contentPw" style="display:none;row-gap:inherit;">
+            <h3>Password</h3>
+            <div class="col-sm-6 w-50 " >
                 <div class="group mt-3">
-                    <input type="text" id="password" placeholder="Password*" name="password" class="form-control" required/>
+                    <input type="text" id="password" placeholder="Password*" name="password" class="form-control" />
                     {{-- <div class="btn" style="border-color:black;">
                          Generate Password
                      </div> --}}
@@ -452,9 +452,9 @@
 
             {{-- <div class="mb-3 mt-2" style="margin-right:200px"> --}}
 
-            <div class="col-sm-6 w-50 ">
+            <div class="col-sm-6 w-50 " >
                 <input type="password" name="confirm_password" id="confirm_password" class="form-control"
-                    placeholder="Confirm Password*" required>
+                    placeholder="Confirm Password*" >
             </div>
 
             {{-- <div class="mb-3" hidden>
@@ -464,7 +464,7 @@
 
         </div>
 
-        <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">Register</button>
+        <button type="submit" class="btn btn-primary btn-lg btn-block mt-3" id="register">Register</button>
         <!-- Button trigger modal -->
 
         {{-- </div> --}}
@@ -476,6 +476,26 @@
 @endsection
 
 @push('script')
+<script>
+    
+        
+        // Add JavaScript to dynamically update the bulan dropdown based on the selected product
+        document.getElementById('role').addEventListener('change', function() {
+            var selectedRole = this.options[this.selectedIndex];
+            let roleVal = selectedRole.value;
+            let password = document.getElementById("contentPw");
+            let btnRegister = document.getElementById("register");
+            
+            console.log(selectedRole,roleVal,password);
+            if(roleVal === "admin"){
+                password.style.display = "block";
+                password.style.rowGap = "inherit";
+            }else{
+                password.style.display = "none";
+            }
+
+        });
+</script>
     <script>
         // script.js 
 

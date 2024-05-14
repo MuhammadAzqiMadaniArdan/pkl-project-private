@@ -69,9 +69,6 @@ class Kernel extends HttpKernel
         'IsLogin' => \App\Http\Middleware\IsLogin::class,
         'IsAdmin' => \App\Http\Middleware\IsAdmin::class,
         'IsGuest' => \App\Http\Middleware\IsGuest::class,
-        // is user bisa dibilang salah cuy
-        // 'IsCashier' => \App\Http\Middleware\IsCashier::class,
-        'IsUser' => \App\Http\Middleware\IsUser::class,
 
     ];
 }

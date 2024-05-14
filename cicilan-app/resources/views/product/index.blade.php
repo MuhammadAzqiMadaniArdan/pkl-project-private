@@ -46,23 +46,27 @@
 <div class="mt-2">
     <form action="{{ route('product.search') }}" method="GET">
   
-    <div class="form-inline">
-        <div class="input-group w-25" data-widget="sidebar-search">
+    <div class="form-inline searchPage">
+        
+        <div class="input-group w-75" data-widget="sidebar-search">
+        <div class="input-group w-50" data-widget="sidebar-search">
+            {{-- <div class="search"> --}}
             <input class=" form-control" name="search" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-append">
+            {{-- <div class="input-group-append"> --}}
                 <button class="btn btn-sidebar" style="background: whitesmoke;">
                     <i class="fas fa-search fa-fw"></i>
                 </button>
-            </div>
-            <a href="{{ route('product.data') }}" class="btn btn-danger w-25 " style="margin-left:5%;border-radius:5px;">reset</a>
+            {{-- </div> --}}
         </div>
-        
+            <a href="{{ route('product.data') }}" class="btn btn-danger ms-2" style="border-radius:5px;">reset</a>
+        </div>
+    </div>
     </form>
 </div>
   
 <div class="container-fluid">
     <div class="table-responsive">
-        <table class="table mt-5 table-striped table-bordered table-hovered">
+        <table class="table mt-4 table-striped table-bordered table-hovered">
         <thead>
         <tr>
             <th>No</th>
@@ -104,7 +108,7 @@
     </div>
 </div>
 <div class="d-flex justify-content-end
-">
+mt-3">
 @if ($products->count())
 {{$products->links()}}
 @endif

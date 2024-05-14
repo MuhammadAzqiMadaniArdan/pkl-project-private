@@ -44,7 +44,7 @@
                 <label for="name" class="col-form-label">Username<span>*</span> :</label>
                 <input type="text" class="form-control" id="name" name="name" value="{{$user['name']}}" required>
              </div>
-             <div class="col-sm-6 w-50 mt-3 mb-3">
+             <div class="col-sm-6 w-100 mt-3 mb-3">
                 <label for="notelp" class="col-sm-2 col-form-label">Notelp<span>*</span> :</label>
                     <input type="text" class="form-control" id="notelp" name="notelp" value="{{$user['notelp']}}" required>
              </div>
@@ -54,44 +54,69 @@
           @foreach ($user['address'] as $address2)
           <div class="row mt-3 mb-2">
             <div class="col-sm-6 w-50 ">
-                <label for="address" class="col-sm-2 col-form-label">Address<span>*</span> :</label>
+                <label for="address" class="col-sm-2 col-form-label w-100">Address<span>*</span> :</label>
                 <input type="text" class="form-control" id="address" name="address" value="{{$address2['address']}}" required>
             </div>
             <div class="col-sm-6 w-50 ">
-                <label for="city" class="col-sm-2 col-form-label">city<span>*</span> :</label>
+                <label for="city" class="col-sm-2 col-form-label w-100">city<span>*</span> :</label>
                     <input type="text" class="form-control" id="city" name="city" value="{{$address2['city']}}" required>
             </div>
             <div class="col-sm-6 w-50 mt-3">
-                <label for="state" class="col-sm-2 col-form-label">state<span>*</span> :</label>
+                <label for="state" class="col-sm-2 col-form-label w-100">state<span>*</span> :</label>
                     <input type="text" class="form-control" id="state" name="state" value="{{$address2['state']}}" required>
             </div>
             <div class="col-sm-6 w-50 mt-3">
-                <label for="country" class="col-sm-2 col-form-label">country<span>*</span> :</label>
+                <label for="country" class="col-sm-2 col-form-label w-100">country<span>*</span> :</label>
                 <input type="text" class="form-control" id="country" name="country" value="{{$address2['country']}}" required>
             </div>
             
             @endforeach
             <div class="col-sm-6 w-100 mt-3 mb-3">
-                <label for="company" class="col-sm-2 col-form-label">Company :</label>
+                <label for="company" class="col-sm-2 col-form-label w-100">Company :</label>
                     <input type="text" class="form-control" id="company" name="company">
             </div>
         </div>
         <h3>Additional Information</h3>
         <div class="row mt-3 mb-3">
             <div class="col-sm-6 w-50 ">
-                <label for="role" class="col-sm-2 col-form-label">role :</label>
+                <label for="role" class="col-sm-2 col-form-label w-100">role :</label>
                 <select id="role" class="form-control" name="role">
                     <option disabled hidden selected>Pilih</option>
                     <option value="admin"{{$user['role'] == 'admin' ? 'selected' : ''}}>Admin</option>
                     <option value="user"{{$user['role'] == 'user' ? 'selected' : ''}}>user</option>
                 </select>
             </div>
-            <div class="col-sm-6 w-50 ">
-                <label for="password" class="col-sm-2 col-form-label">Password:</label>
-                <input type="text" class="form-control" id="password" name="password" placeholder="Ubah Password">
+            {{-- @if ($user['role'] == "admin") --}}
+            <div class="col-sm-6 w-50 " id="contentPw" style="display: none;">
+                <label for="password" class="col-sm-2 col-form-label w-100">Password:</label>
+                <input type="text" class="form-control" id="password" name="password" placeholder="Buat Password">
             </div>
-        </div>
+            
+        {{-- </div> --}}
         
-        <button type="submit" class="btn btn-primary">Simpan Data</button>
+        <button type="submit" class="btn btn-primary mt-4">Simpan Data</button>
     </form>
 @endsection
+
+@push('script')
+<script>
+    
+        
+        // Add JavaScript to dynamically update the bulan dropdown based on the selected product
+        document.getElementById('role').addEventListener('change', function() {
+            var selectedRole = this.options[this.selectedIndex];
+            let roleVal = selectedRole.value;
+            let password = document.getElementById("contentPw");
+            let btnRegister = document.getElementById("register");
+            
+            console.log(selectedRole,roleVal,password);
+            if(roleVal === "admin"){
+                password.style.display = "block";
+                password.style.rowGap = "inherit";
+            }else{
+                password.style.display = "none";
+            }
+
+        });
+</script>
+@endpush

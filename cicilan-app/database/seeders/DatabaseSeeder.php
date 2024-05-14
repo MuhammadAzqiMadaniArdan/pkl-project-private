@@ -33,11 +33,5 @@ class DatabaseSeeder extends Seeder
             "role" => "admin",
         ]);
         
-        User::create([ 
-            "name" => "User-IKD",
-            "email" => "user@gmail.com",
-            "password" => Hash::make("userIKD"),
-            "role" => "user",
-        ]);
     }
 }

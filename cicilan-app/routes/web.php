@@ -22,8 +22,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('IsGuest')->group(function () {
     // ketika akses link pertama kali yg dimunculin halaman login
     Route::get('/', function () {
-        return view('main');
-    })->name('main');
+        return view('index');
+    })->name('index');
 
     Route::get('/login', function () {
         return view('login');
@@ -37,15 +37,9 @@ Route::middleware('IsGuest')->group(function () {
     });
 
 
-    Route::prefix('/loginAdmin')->name('loginAdmin.')->group(function () {
-        Route::get('/', function () {
-            return view('loginAdmin');
-        })->name('index');
-    });
 
     // menangani proses submit login
     Route::post('/loginUser', [UserController::class, 'authLogin'])->name('auth-login');
-    Route::post('/loginAdmin', [UserController::class, 'authLoginAdmin'])->name('auth-login-Admin');
     Route::post('/register', [UserController::class, 'authregister'])->name('auth-register');
 });
 
@@ -92,6 +86,7 @@ Route::middleware('IsLogin')->group(function () {
             Route::delete('/delete/{id}', [ProductController::class, 'destroy'])->name('delete');
             Route::get('/data/stock', [ProductController::class, 'stockData'])->name('data.stock');
             Route::get('/{id}', [ProductController::class, 'show'])->name('show');
+            
             Route::patch('/stock/update/{id}', [ProductController::class, 'updateStock'])->name('stock.update');
         });
         Route::prefix('/detail_server')->name('detail_server.')->group(function () {
@@ -140,14 +135,18 @@ Route::middleware('IsLogin')->group(function () {
         });
 
         Route::prefix('/status')->name('status.')->group(function () {
-            Route::get('/', [OrderStatusController::class, 'index'])->name('index');
+            // Route::get('/', [OrderStatusController::class, 'index'])->name('index');
             Route::get('/create', [OrderStatusController::class, 'create'])->name('create');
             Route::get('/search', [UserController::class, 'search'])->name('search');   
-            Route::get('/status', [OrderStatusController::class, 'status'])->name('status');
-            Route::get('/dedicated', [ProductController::class, 'dedicatedNew'])->name('dedicated');
+             Route::get('/status/{id}', [OrderStatusController::class, 'status'])->name('status');
+            Route::get('/colocation', [ProductController::class, 'colocationIndex'])->name('colocation');
+            Route::get('/dedicated', [ProductController::class, 'dedicatedIndex'])->name('dedicated');
+            Route::get('/dedicatedSearch', [ProductController::class, 'dedicatedSearch'])->name('dedicatedSearch');
+            Route::get('/colocationSearch', [ProductController::class, 'colocationSearch'])->name('colocationSearch');
+            Route::get('/sewaDate', [ProductController::class, 'sewaDate'])->name('sewaDate');
+
             Route::get('/sewaData', [OrderStatusController::class, 'sewaIndex'])->name('sewaIndex');
             Route::get('/sewa/{id}', [OrderStatusController::class, 'sewa'])->name('sewa');
-            Route::get('/colocation', [ProductController::class, 'colocationNew'])->name('colocation');
             Route::post('/store', [OrderStatusController::class, 'store'])->name('store');
             Route::get('/single/{id}', [OrderStatusController::class, 'single'])->name('single');
             Route::delete('/deleteSingle/{id}', [OrderStatusController::class, 'deleteSingle'])->name('deleteSingle');
@@ -162,44 +161,12 @@ Route::middleware('IsLogin')->group(function () {
             
             Route::get('/custom/{id}', [OrderStatusController::class, 'custom'])->name('custom');
             Route::get('/struk/{id}', [OrderStatusController::class, 'strukPembelian'])->name('struk');
-            // Route::get('/download-pdf/{id}', [OrderStatusController::class, 'downloadPDF'])->name('download-pdf');
             Route::get('/search', [OrderStatusController::class, 'search'])->name('search');
             Route::post('add-remove-multiple-input-fields', [OrderStatusController::class, 'storeMulitple']);
             Route::patch('/lunas/{id}', [OrderStatusController::class, 'lunasUpdate'])->name('lunasUpdate');
+            Route::patch('/votes/{id}',[OrderStatusController::class,'votesUpdate'])->name('votesUpdate');
         });
     });
 
-    Route::middleware('IsUser')->group(function () {
-
-        Route::prefix('/userAkun')->name('userAkun.')->group(function () {
-            Route::get('/edit/{id}', [UserController::class, 'editAkun'])->name('editAkun');
-            Route::patch('/update/{id}', [UserController::class, 'updateAkun'])->name('updateAkun');
-        });
-
-        Route::prefix('/order')->name('order.')->group(function () {
-            Route::get('/', [OrderController::class, 'index'])->name('index');
-            Route::get('/create', [OrderController::class, 'create'])->name('create');
-            Route::get('/dedicated', [OrderController::class, 'dedicated'])->name('dedicated');
-            Route::get('/colocation', [OrderController::class, 'colocation'])->name('colocation');
-            Route::post('/store', [OrderController::class, 'store'])->name('store');
-            Route::get('/edit/{id}', [OrderController::class, 'edit'])->name('edit');
-            Route::get('/bayar/{id}', [OrderController::class, 'bayar'])->name('bayar');
-            Route::get('/length/{id}', [OrderController::class, 'length'])->name('length');
-            Route::get('/show/{id}', [OrderController::class, 'show'])->name('show');
-            Route::patch('/update/{id}', [OrderController::class, 'update'])->name('update');
-            Route::get('/pengiriman/{id}', [OrderController::class, 'pengiriman'])->name('pengiriman');
-            Route::get('/lunas/{id}', [OrderController::class, 'lunas'])->name('lunas');
-            Route::patch('/choose-collocation/{id}', [OrderController::class, 'chooseCollocation'])->name('choose-collocation');
-            Route::get('/struk/{id}', [OrderController::class, 'strukPembelian'])->name('struk');
-            Route::get('/download-pdf/{id}', [OrderController::class, 'downloadPDF'])->name('download-pdf');
-            Route::get('/search', [OrderController::class, 'search'])->name('search');
-            Route::get('cart', [ProductController::class, 'cart'])->name('cart');
-            Route::get('add-to-cart/{id}', [ProductController::class, 'addToCart'])->name('addToCart');
-            Route::patch('update-cart', [ProductController::class, 'updateCart'])->name('updateCart');
-            Route::delete('remove-from-cart', [ProductController::class, 'removeCart'])->name('removeCart');
-            Route::get('/sewa/{id}', [OrderStatusController::class, 'sewaUser'])->name('sewa');
-            Route::patch('/sewaEntry/{id}', [OrderStatusController::class, 'sewaEntry'])->name('sewaEntry');
-        });
-
-    });
+    
 });
